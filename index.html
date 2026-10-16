@@ -1,0 +1,2233 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAT Blueprint 2026 — Interactive Syllabus, Strategy & Analytics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.05);
+        }
+        .dark ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(100, 116, 139, 0.4);
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(100, 116, 139, 0.7);
+        }
+        .glass-card {
+            backdrop-filter: blur(12px);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .tab-btn.active {
+            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+            color: white;
+            box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.35);
+        }
+        .subtab-btn.active {
+            border-bottom: 2px solid #6366f1;
+            color: #6366f1;
+            font-weight: 600;
+        }
+        .dark .subtab-btn.active {
+            border-bottom: 2px solid #818cf8;
+            color: #818cf8;
+        }
+        input[type="range"] {
+            accent-color: #6366f1;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade {
+            animation: fadeIn 0.25s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
+
+    <!-- Top Reading Progress Bar -->
+    <div class="fixed top-0 left-0 right-0 h-1 bg-slate-200 dark:bg-slate-800 z-50">
+        <div id="readingProgressBar" class="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-400 w-0 transition-all duration-150"></div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="sticky top-1 z-40 bg-white/85 dark:bg-slate-900/85 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 lg:px-8 py-3">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            <!-- Brand & Title -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-500/25">
+                    <i data-lucide="compass" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="font-bold text-base sm:text-lg tracking-tight">CAT Strategy & Syllabus Blueprint</h1>
+                        <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-mono font-semibold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
+                            2018–2025 Empirical Baseline
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Interactive Reference Document & Decision Engine • 41 Granular Study Units</p>
+                </div>
+            </div>
+
+            <!-- Global Progress Pill & Controls -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <div class="hidden md:flex items-center gap-2.5 bg-slate-100 dark:bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-200/80 dark:border-slate-700/70">
+                    <div class="text-xs">
+                        <span class="text-slate-500 dark:text-slate-400">Mastery Checklist:</span>
+                        <span id="globalMasteryText" class="font-mono font-bold text-indigo-600 dark:text-indigo-400 ml-1">0/41 (0%)</span>
+                    </div>
+                    <div class="w-20 h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                        <div id="globalMasteryBar" class="h-full bg-emerald-500 w-0 transition-all duration-300"></div>
+                    </div>
+                </div>
+
+                <!-- Quick Search Modal Trigger -->
+                <button onclick="switchMainTab('syllabus'); document.getElementById('topicSearchInput').focus();" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition flex items-center gap-1.5 text-xs font-medium" title="Search Syllabus">
+                    <i data-lucide="search" class="w-4 h-4"></i>
+                    <span class="hidden sm:inline">Search Topics</span>
+                </button>
+
+                <!-- Theme Toggle -->
+                <button id="themeToggleBtn" onclick="toggleTheme()" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition" title="Toggle Light/Dark Mode">
+                    <i data-lucide="sun" class="w-4 h-4 hidden dark:block text-amber-400"></i>
+                    <i data-lucide="moon" class="w-4 h-4 block dark:hidden text-slate-700"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Primary Navigation Tabs -->
+        <div class="max-w-7xl mx-auto mt-3 pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
+            <button onclick="switchMainTab('overview')" id="tab-overview" class="tab-btn active px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium whitespace-nowrap flex items-center gap-2 transition">
+                <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                <span>1. Executive & Exam Architecture</span>
+            </button>
+            <button onclick="switchMainTab('syllabus')" id="tab-syllabus" class="tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium whitespace-nowrap flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                <i data-lucide="layers" class="w-4 h-4"></i>
+                <span>2. Syllabus & SPI Explorer (41 Units)</span>
+            </button>
+            <button onclick="switchMainTab('archetypes')" id="tab-archetypes" class="tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium whitespace-nowrap flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                <i data-lucide="crosshair" class="w-4 h-4"></i>
+                <span>3. Tactical Protocols & Walkthroughs</span>
+            </button>
+            <button onclick="switchMainTab('dependencies')" id="tab-dependencies" class="tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium whitespace-nowrap flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                <i data-lucide="git-branch" class="w-4 h-4"></i>
+                <span>4. Profiles & Dependency Map</span>
+            </button>
+            <button onclick="switchMainTab('roadmaps')" id="tab-roadmaps" class="tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium whitespace-nowrap flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                <i data-lucide="calendar-clock" class="w-4 h-4"></i>
+                <span>5. Roadmaps (30/60/90/180d)</span>
+            </button>
+            <button onclick="switchMainTab('analytics')" id="tab-analytics" class="tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium whitespace-nowrap flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                <i data-lucide="calculator" class="w-4 h-4"></i>
+                <span>6. Percentile Simulator & Mock Analytics</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6 space-y-8">
+
+        <!-- ========================================== -->
+        <!-- VIEW 1: EXECUTIVE SUMMARY & ARCHITECTURE   -->
+        <!-- ========================================== -->
+        <section id="view-overview" class="space-y-8 animate-fade">
+            <!-- Hero Banner -->
+            <div class="relative rounded-2xl overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white p-6 sm:p-8 border border-indigo-500/30 shadow-xl">
+                <div class="max-w-3xl space-y-4">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 text-xs font-medium">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                        <span>Deliverable A • Research Coverage: CAT 2018 – CAT 2025 (15 Standardized 40-Min Slots)</span>
+                    </div>
+                    <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight">
+                        High-Probability Mark Extraction Over Linear Syllabus Completion
+                    </h2>
+                    <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                        Empirical evaluation of CAT papers from 2021 through 2025 demonstrates that the examination functions primarily as a <strong>psychometric filter of cognitive adaptability, rapid question triage, and time-constrained execution</strong>. Clearing the <strong>99th overall percentile</strong> consistently requires achieving only <strong>41% to 47% of maximum raw marks</strong> (solving 45%–50% of the paper with 85%+ accuracy).
+                    </p>
+                    <div class="pt-2 flex flex-wrap gap-3">
+                        <button onclick="switchMainTab('syllabus')" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-indigo-600/30 transition">
+                            <span>Explore 41 Granular Syllabus Units</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="switchMainTab('analytics')" class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs sm:text-sm flex items-center gap-2 border border-white/15 transition">
+                            <i data-lucide="sliders" class="w-4 h-4"></i>
+                            <span>Launch Score-to-Percentile Simulator</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Key KPI Stat Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <div class="flex items-center justify-between text-slate-400 mb-2">
+                        <span class="text-xs font-semibold uppercase tracking-wider">Current Baseline (2024–25)</span>
+                        <i data-lucide="file-Spreadsheet" class="w-4 h-4 text-indigo-500"></i>
+                    </div>
+                    <div class="text-2xl sm:text-3xl font-extrabold font-mono text-slate-900 dark:text-white">68 Qs / 204 Marks</div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">120 Mins (40m/section) • ~48 MCQs (+3/-1) & ~20 TITAs (+3/0)</p>
+                </div>
+
+                <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <div class="flex items-center justify-between text-slate-400 mb-2">
+                        <span class="text-xs font-semibold uppercase tracking-wider">99th %ile Threshold</span>
+                        <i data-lucide="award" class="w-4 h-4 text-emerald-500"></i>
+                    </div>
+                    <div class="text-2xl sm:text-3xl font-extrabold font-mono text-emerald-600 dark:text-emerald-400">41% – 47% Marks</div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">84.8 marks in CAT '25 • 95.13 in CAT '24 • 79–84 in CAT '23</p>
+                </div>
+
+                <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <div class="flex items-center justify-between text-slate-400 mb-2">
+                        <span class="text-xs font-semibold uppercase tracking-wider">QA Concentration</span>
+                        <i data-lucide="pie-chart" class="w-4 h-4 text-amber-500"></i>
+                    </div>
+                    <div class="text-2xl sm:text-3xl font-extrabold font-mono text-amber-600 dark:text-amber-400">68% – 75%</div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Arithmetic + Algebra account for 15–17 of 22 QA questions/slot</p>
+                </div>
+
+                <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <div class="flex items-center justify-between text-slate-400 mb-2">
+                        <span class="text-xs font-semibold uppercase tracking-wider">DILR 99%ile Target</span>
+                        <i data-lucide="puzzle" class="w-4 h-4 text-purple-500"></i>
+                    </div>
+                    <div class="text-2xl sm:text-3xl font-extrabold font-mono text-purple-600 dark:text-purple-400">2 to 3 Sets / 5</div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">27.3–37.8 scaled marks • 5-min opening set selection is critical</p>
+                </div>
+            </div>
+
+            <!-- Three Structural Realities Interactive Breakdown -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- VARC Card -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 flex flex-col justify-between shadow-sm">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">Section 1 • First 40 Mins</span>
+                            <span class="font-mono text-xs font-semibold text-slate-500">24 Qs • 72 Marks</span>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">Verbal Ability & RC (VARC)</h3>
+                        <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mb-4">
+                            Fixed two-engine architecture: <strong>16 RC questions</strong> (4 passages × 4 MCQs) + <strong>8 VA questions</strong>. Exhibits the highest sectional score cutoffs (39.8–44.0 marks for 99%ile).
+                        </p>
+                        <!-- Domain Distribution Bar -->
+                        <div class="space-y-2 mb-4">
+                            <div class="flex justify-between text-xs font-medium">
+                                <span>Reading Comprehension (16 Qs)</span>
+                                <span class="font-mono">66.7%</span>
+                            </div>
+                            <div class="w-full h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex">
+                                <div class="bg-blue-500 h-full" style="width: 66.7%"></div>
+                                <div class="bg-cyan-400 h-full" style="width: 33.3%"></div>
+                            </div>
+                            <div class="flex justify-between text-[11px] text-slate-500">
+                                <span>🔵 RC: Inference, Main Idea, CR</span>
+                                <span>💠 VA (33.3%): Summary, Insertion, Odd-Out</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-3 rounded-xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200/60 dark:border-blue-800/50 text-xs text-blue-900 dark:text-blue-200">
+                        <strong>CAT 2024 Tactical Shift:</strong> Traditional 4-sentence TITA Para Jumbles were omitted across all 3 slots and replaced with 4-option MCQ <em>Sentence Placement</em>.
+                    </div>
+                </div>
+
+                <!-- DILR Card -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 flex flex-col justify-between shadow-sm">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20">Section 2 • Middle 40 Mins</span>
+                            <span class="font-mono text-xs font-semibold text-slate-500">22 Qs (5 Sets) • 66 Marks</span>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">Data Interpretation & LR (DILR)</h3>
+                        <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mb-4">
+                            Expanded in CAT 2024–2025 from 20 Qs (4 sets) to <strong>22 Qs across 5 sets</strong> (three 4-Q sets and two 5-Q sets) within the unchanged 40-minute window.
+                        </p>
+                        <!-- Domain Distribution Bar -->
+                        <div class="space-y-2 mb-4">
+                            <div class="flex justify-between text-xs font-medium">
+                                <span>Pure LR vs. Hybrid vs. Pure DI</span>
+                                <span class="font-mono">59.1% / 22.7% / 18.2%</span>
+                            </div>
+                            <div class="w-full h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex">
+                                <div class="bg-purple-600 h-full" style="width: 59.1%"></div>
+                                <div class="bg-fuchsia-500 h-full" style="width: 22.7%"></div>
+                                <div class="bg-pink-400 h-full" style="width: 18.2%"></div>
+                            </div>
+                            <div class="flex justify-between text-[11px] text-slate-500">
+                                <span>🟣 Pure LR (59.1%)</span>
+                                <span>🩷 Hybrid (22.7%)</span>
+                                <span>🌸 Pure DI (18.2%)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-3 rounded-xl bg-purple-50/70 dark:bg-purple-950/30 border border-purple-200/60 dark:border-purple-800/50 text-xs text-purple-900 dark:text-purple-200">
+                        <strong>Highest-Leverage Skill:</strong> Opening 5-minute set triage and enforcing the hard 4-minute abandonment rule if a master grid fails to lock.
+                    </div>
+                </div>
+
+                <!-- QA Card -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 flex flex-col justify-between shadow-sm">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">Section 3 • Final 40 Mins</span>
+                            <span class="font-mono text-xs font-semibold text-slate-500">22 Qs • 66 Marks</span>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">Quantitative Aptitude (QA)</h3>
+                        <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mb-4">
+                            Administered when cognitive fatigue peaks. Extreme concentration in <strong>Arithmetic (8–11 Qs)</strong> and <strong>Algebra (5–8 Qs)</strong>, with steady <strong>Geometry (3–4 Qs)</strong>.
+                        </p>
+                        <!-- Domain Distribution Bar -->
+                        <div class="space-y-2 mb-4">
+                            <div class="flex justify-between text-xs font-medium">
+                                <span>Arith + Alg (72%) • Geo (16%) • Num/Mod (12%)</span>
+                                <span class="font-mono">22 Qs/Slot</span>
+                            </div>
+                            <div class="w-full h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex">
+                                <div class="bg-emerald-500 h-full" style="width: 43%"></div>
+                                <div class="bg-teal-500 h-full" style="width: 29%"></div>
+                                <div class="bg-amber-500 h-full" style="width: 16%"></div>
+                                <div class="bg-slate-400 h-full" style="width: 12%"></div>
+                            </div>
+                            <div class="flex justify-between text-[11px] text-slate-500">
+                                <span>🟢 Arith (43%)</span>
+                                <span>🩵 Alg (29%)</span>
+                                <span>🟡 Geo (16%)</span>
+                                <span>⚪ Num/Mod</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-3 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-800/50 text-xs text-emerald-900 dark:text-emerald-200">
+                        <strong>Execution Mandate:</strong> Never solve Q1 to Q22 linearly. Use the 3-Round Scanning Protocol to extract 6–8 sitters in the first 18 minutes.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exam Architecture Comparison & IIM Weightages -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Historical Architecture Table -->
+                <div class="lg:col-span-7 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm overflow-hidden">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-base sm:text-lg font-bold">Official CAT Examination Architecture Evolution</h3>
+                            <p class="text-xs text-slate-500">Fixed sequence: VARC → DILR → QA (Zero cross-sectional time transfer)</p>
+                        </div>
+                        <span class="px-2.5 py-1 rounded-md text-xs font-mono bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">3 Slots / Day</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                            <thead>
+                                <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400">
+                                    <th class="py-2.5 pr-3 font-semibold">Parameter</th>
+                                    <th class="py-2.5 px-3 font-semibold">CAT 2021–2023</th>
+                                    <th class="py-2.5 px-3 font-semibold text-indigo-600 dark:text-indigo-400">CAT 2024–2025 Baseline</th>
+                                    <th class="py-2.5 pl-3 font-semibold">Strategic Implication</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200/60 dark:divide-slate-800/70">
+                                <tr>
+                                    <td class="py-2.5 pr-3 font-medium">Section 1: VARC</td>
+                                    <td class="py-2.5 px-3 font-mono text-xs">24 Qs (72M)</td>
+                                    <td class="py-2.5 px-3 font-mono text-xs font-bold text-indigo-600 dark:text-indigo-400">24 Qs (72M)</td>
+                                    <td class="py-2.5 pl-3 text-xs text-slate-600 dark:text-slate-400">Fixed 16 RC + 8 VA; highest mean sectional scores.</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2.5 pr-3 font-medium">Section 2: DILR</td>
+                                    <td class="py-2.5 px-3 font-mono text-xs">20 Qs (60M)</td>
+                                    <td class="py-2.5 px-3 font-mono text-xs font-bold text-indigo-600 dark:text-indigo-400">22 Qs (66M)</td>
+                                    <td class="py-2.5 pl-3 text-xs text-slate-600 dark:text-slate-400">Expanded from 4 sets (5 Qs) to 5 sets (three 4-Q, two 5-Q sets).</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2.5 pr-3 font-medium">Section 3: QA</td>
+                                    <td class="py-2.5 px-3 font-mono text-xs">22 Qs (66M)</td>
+                                    <td class="py-2.5 px-3 font-mono text-xs font-bold text-indigo-600 dark:text-indigo-400">22 Qs (66M)</td>
+                                    <td class="py-2.5 pl-3 text-xs text-slate-600 dark:text-slate-400">Final 40 mins; avoid early calculation traps.</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2.5 pr-3 font-medium">Total Qs & Marks</td>
+                                    <td class="py-2.5 px-3 font-mono text-xs">66 Qs (198M)</td>
+                                    <td class="py-2.5 px-3 font-mono text-xs font-bold text-indigo-600 dark:text-indigo-400">68 Qs (204M)</td>
+                                    <td class="py-2.5 pl-3 text-xs text-slate-600 dark:text-slate-400">Each correct answer = ~1.47% of total raw marks.</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2.5 pr-3 font-medium">MCQ vs. TITA</td>
+                                    <td class="py-2.5 px-3 font-mono text-xs">+3/-1 | +3/0</td>
+                                    <td class="py-2.5 px-3 font-mono text-xs font-bold text-indigo-600 dark:text-indigo-400">48 MCQ / 20 TITA</td>
+                                    <td class="py-2.5 pl-3 text-xs text-slate-600 dark:text-slate-400">2-option MCQ guess EV = +1.0; 100% TITA attempt mandatory.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- IIM Admissions Weightage Explorer -->
+                <div class="lg:col-span-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-base sm:text-lg font-bold">IIM & B-School Shortlisting Weights</h3>
+                            <span class="text-xs px-2 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 font-medium">70–85%ile Gate</span>
+                        </div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">
+                            Select an institute below to inspect how normalized CAT scores combine with academics and work experience for WAT-PI calls:
+                        </p>
+                        <!-- Institute Selector Pills -->
+                        <div class="flex flex-wrap gap-1.5 mb-4" id="iimSelectorPills">
+                            <button onclick="selectInstitute('IIMA')" id="inst-IIMA" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition">IIM Ahmedabad</button>
+                            <button onclick="selectInstitute('IIMB')" id="inst-IIMB" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition">IIM Bangalore</button>
+                            <button onclick="selectInstitute('IIMC')" id="inst-IIMC" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition">IIM Calcutta</button>
+                            <button onclick="selectInstitute('IIMK')" id="inst-IIMK" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition">IIM Kozhikode</button>
+                            <button onclick="selectInstitute('FMS')" id="inst-FMS" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition">FMS Delhi</button>
+                        </div>
+
+                        <!-- Dynamic Institute Details Box -->
+                        <div id="instituteDetailCard" class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-3">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Mathematical Normalization Callout -->
+                    <div class="mt-4 pt-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500">
+                        <span><strong>Scaled Score:</strong> $\hat{X} = \mu + \left(\frac{X - \mu_s}{\sigma_s}\right)\sigma$</span>
+                        <span><strong>Percentile:</strong> $P = \left(\frac{N - R}{N}\right)\times 100$</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 2: SYLLABUS & SPI EXPLORER (41 UNITS) -->
+        <!-- ========================================== -->
+        <section id="view-syllabus" class="space-y-6 hidden animate-fade">
+            <!-- Section Header & SPI Formula Explanation -->
+            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Deliverables B & C • Complete Syllabus Taxonomy & Master Tables</span>
+                        <h2 class="text-xl sm:text-2xl font-extrabold mt-0.5">Interactive Syllabus, Difficulty & Scoring Potential Explorer</h2>
+                        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+                            Filter all <strong>41 granular CAT study units</strong> (21 QA, 10 DILR, 10 VARC), inspect common traps, and check off completed chapters to track your preparation hours.
+                        </p>
+                    </div>
+                    <!-- 8-Factor SPI Formula Badge -->
+                    <div class="bg-slate-50 dark:bg-slate-800/80 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs max-w-md">
+                        <div class="font-semibold text-slate-800 dark:text-slate-200 mb-1 flex items-center gap-1.5">
+                            <i data-lucide="cpu" class="w-4 h-4 text-indigo-500"></i>
+                            <span>8-Factor Scoring Potential Index (SPI 1.0–10.0)</span>
+                        </div>
+                        <code class="text-[11px] font-mono text-indigo-600 dark:text-indigo-400 block">
+                            SPI = 0.20(F) + 0.20(A) + 0.15(T) + 0.15(E) + 0.10(C) + 0.10(D) + 0.05(R) + 0.05(P)
+                        </code>
+                        <p class="text-[11px] text-slate-500 mt-1">
+                            Weights: Frequency (20%), Accuracy (20%), Time Efficiency (15%), Ease of Mastery (15%), Transfer Value (10%), Consistency (10%), TITA Safety (5%), Pressure Resilience (5%).
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Interactive Filter & Search Controls -->
+                <div class="mt-6 pt-5 border-t border-slate-200 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3">
+                    <!-- Section Filter -->
+                    <div class="lg:col-span-4 flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+                        <button onclick="setSyllabusFilter('section', 'ALL')" id="secFilter-ALL" class="flex-1 py-1.5 px-2 rounded-lg text-xs font-semibold bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm transition">All (41)</button>
+                        <button onclick="setSyllabusFilter('section', 'QA')" id="secFilter-QA" class="flex-1 py-1.5 px-2 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 transition">QA (21)</button>
+                        <button onclick="setSyllabusFilter('section', 'DILR')" id="secFilter-DILR" class="flex-1 py-1.5 px-2 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 transition">DILR (10)</button>
+                        <button onclick="setSyllabusFilter('section', 'VARC')" id="secFilter-VARC" class="flex-1 py-1.5 px-2 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 transition">VARC (10)</button>
+                    </div>
+
+                    <!-- Priority Tier Filter -->
+                    <div class="lg:col-span-3 flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+                        <button onclick="setSyllabusFilter('priority', 'ALL')" id="prioFilter-ALL" class="flex-1 py-1.5 px-2 rounded-lg text-xs font-semibold bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm transition">All Tiers</button>
+                        <button onclick="setSyllabusFilter('priority', 'P1')" id="prioFilter-P1" class="flex-1 py-1.5 px-2 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 transition">P1 Critical</button>
+                        <button onclick="setSyllabusFilter('priority', 'P2')" id="prioFilter-P2" class="flex-1 py-1.5 px-2 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 transition">P2 High</button>
+                        <button onclick="setSyllabusFilter('priority', 'P3')" id="prioFilter-P3" class="flex-1 py-1.5 px-2 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 transition">P3/P4</button>
+                    </div>
+
+                    <!-- Search Box -->
+                    <div class="lg:col-span-3 relative">
+                        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                        <input type="text" id="topicSearchInput" oninput="renderSyllabusItems()" placeholder="Search topic, concept, or trap..." class="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-transparent focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-900 text-xs sm:text-sm outline-none transition">
+                    </div>
+
+                    <!-- Sort Selector -->
+                    <div class="lg:col-span-2">
+                        <select id="topicSortSelect" onchange="renderSyllabusItems()" class="w-full py-2 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs sm:text-sm font-medium outline-none border border-transparent focus:border-indigo-500">
+                            <option value="spi-desc">Sort: Highest SPI</option>
+                            <option value="freq-desc">Sort: Highest Share %</option>
+                            <option value="diff-asc">Sort: Easiest First</option>
+                            <option value="diff-desc">Sort: Hardest First</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Filtered Summary Bar -->
+                <div class="mt-4 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
+                    <div id="syllabusFilterStats">Showing 41 topics</div>
+                    <div class="flex items-center gap-4">
+                        <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> P1 Critical (85% Attempt Target)</span>
+                        <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-indigo-500"></span> P2 High (65% Attempt Target)</span>
+                        <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-amber-500"></span> P3/P4 Secondary / Defer</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dynamic Grid of Syllabus Cards -->
+            <div id="syllabusCardsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Populated dynamically via JS -->
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 3: TACTICAL PROTOCOLS & WALKTHROUGHS  -->
+        <!-- ========================================== -->
+        <section id="view-archetypes" class="space-y-8 hidden animate-fade">
+            <!-- Header -->
+            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+                <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Deliverables B & D • In-Exam Execution & Case Walkthroughs</span>
+                <h2 class="text-xl sm:text-2xl font-extrabold mt-0.5">40-Minute Sectional Execution Protocols & Official CAT Walkthroughs</h2>
+                <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+                    Interactive step-by-step tactical engines for VARC, DILR, and QA, paired with real CAT 2024 & CAT 2021 question progressions.
+                </p>
+            </div>
+
+            <!-- 3 Sectional Tactical Engines -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- QA 3-Round Protocol -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">QA • 40-Min Clock</span>
+                        <span class="font-mono text-xs text-slate-400">Hard Cutoff: 120s in R1</span>
+                    </div>
+                    <h3 class="text-lg font-bold">QA Three-Round Scanning Protocol</h3>
+                    <div class="space-y-3">
+                        <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border-l-4 border-emerald-500">
+                            <div class="flex justify-between text-xs font-bold text-emerald-600 dark:text-emerald-400 mb-1">
+                                <span>ROUND 1: SITTER EXTRACTION</span>
+                                <span class="font-mono">Mins 0 – 18</span>
+                            </div>
+                            <p class="text-xs text-slate-600 dark:text-slate-300">
+                                Scan all 22 Qs rapidly. Immediately solve <strong>6–8 single-concept sitters</strong> (<90s each). Bookmark moderate multi-step problems. Ruthlessly skip walls of text.
+                            </p>
+                        </div>
+                        <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border-l-4 border-indigo-500">
+                            <div class="flex justify-between text-xs font-bold text-indigo-600 dark:text-indigo-400 mb-1">
+                                <span>ROUND 2: BOOKMARK CONVERSION</span>
+                                <span class="font-mono">Mins 18 – 34</span>
+                            </div>
+                            <p class="text-xs text-slate-600 dark:text-slate-300">
+                                Return to bookmarked problems and solve <strong>5–7 moderate questions</strong> using structural shortcuts (center bisection, LCM work units, $n=1,2,3$ substitution).
+                            </p>
+                        </div>
+                        <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border-l-4 border-amber-500">
+                            <div class="flex justify-between text-xs font-bold text-amber-600 dark:text-amber-400 mb-1">
+                                <span>ROUND 3: TITA SWEEP & 50/50 SPLITS</span>
+                                <span class="font-mono">Mins 34 – 40</span>
+                            </div>
+                            <p class="text-xs text-slate-600 dark:text-slate-300">
+                                Mark any 50/50 two-option MCQ split ($EV = +1.0$) and key in an educated numerical response for <strong>100% of the ~8 zero-penalty TITA questions</strong>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DILR Triage & 4-Minute Rule -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-purple-500/10 text-purple-600 dark:text-purple-400">DILR • 40-Min Clock</span>
+                        <span class="font-mono text-xs text-slate-400">Abandon Trigger: Min 4.0</span>
+                    </div>
+                    <h3 class="text-lg font-bold">DILR 5-Min Triage & Abandonment</h3>
+                    <div class="space-y-3">
+                        <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border-l-4 border-purple-500">
+                            <div class="flex justify-between text-xs font-bold text-purple-600 dark:text-purple-400 mb-1">
+                                <span>PHASE 1: 5-MINUTE TRIAGE SCAN</span>
+                                <span class="font-mono">Mins 0 – 5</span>
+                            </div>
+                            <p class="text-xs text-slate-600 dark:text-slate-300">
+                                Inspect all 5 sets without solving. Rank top 3 sets by: (1) <strong>Fixed Structural Base</strong> (Charts, Tables, Matrix, Venn), (2) <strong>Anchor Clue Density</strong>, and (3) <strong>Closed MCQ Stems</strong>.
+                            </p>
+                        </div>
+                        <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border-l-4 border-fuchsia-500">
+                            <div class="flex justify-between text-xs font-bold text-fuchsia-600 dark:text-fuchsia-400 mb-1">
+                                <span>PHASE 2: INVARIANT & GROUP LOCK</span>
+                                <span class="font-mono">Set Mins 0 – 4</span>
+                            </div>
+                            <p class="text-xs text-slate-600 dark:text-slate-300">
+                                Extract global match/sum invariants first. Lock group splits before filling round schedules. Grab immediate 1–2 partial-deduction questions (+3 to +6M).
+                            </p>
+                        </div>
+                        <div class="p-3.5 rounded-xl bg-rose-50/70 dark:bg-rose-950/30 border-l-4 border-rose-500">
+                            <div class="flex justify-between text-xs font-bold text-rose-600 dark:text-rose-400 mb-1">
+                                <span>HARD ABANDONMENT TRIGGER</span>
+                                <span class="font-mono">At Minute 4.0</span>
+                            </div>
+                            <p class="text-xs text-slate-600 dark:text-slate-300">
+                                If the master structural frame is not locked with $\ge 2$ fixed anchors (or $\le 2$ sub-cases) by <strong>Minute 4.0</strong>, abandon immediately to prevent sunk-cost bleed.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VARC Two-Engine Pacing -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400">VARC • 40-Min Clock</span>
+                        <span class="font-mono text-xs text-slate-400">27m RC + 13m VA</span>
+                    </div>
+                    <h3 class="text-lg font-bold">VARC 2-Engine Pacing & Elimination</h3>
+                    <div class="space-y-3">
+                        <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border-l-4 border-blue-500">
+                            <div class="flex justify-between text-xs font-bold text-blue-600 dark:text-blue-400 mb-1">
+                                <span>ENGINE 1: RC DISCOURSE MAPPING</span>
+                                <span class="font-mono">Mins 0 – 27</span>
+                            </div>
+                            <p class="text-xs text-slate-600 dark:text-slate-300">
+                                Spend 6.5–7m per passage (for 4 RCs) or 8.5m (for 3 RCs, skipping toughest). Track thesis, paragraph roles, and shifts between cited scholars and the author.
+                            </p>
+                        </div>
+                        <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border-l-4 border-cyan-500">
+                            <div class="flex justify-between text-xs font-bold text-cyan-600 dark:text-cyan-400 mb-1">
+                                <span>3-FLAW DISTRACTOR AUDIT</span>
+                                <span class="font-mono">Per RC / Summary</span>
+                            </div>
+                            <p class="text-xs text-slate-600 dark:text-slate-300">
+                                Never look for the "right-sounding" choice. Eliminate 3 options via: <strong>Quantifier Inflation</strong> (*may $\rightarrow$ must*), <strong>Scope Distortion</strong>, or <strong>Polarity Inversion</strong>.
+                            </p>
+                        </div>
+                        <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border-l-4 border-indigo-500">
+                            <div class="flex justify-between text-xs font-bold text-indigo-600 dark:text-indigo-400 mb-1">
+                                <span>ENGINE 2: 8-QUESTION VA SPRINT</span>
+                                <span class="font-mono">Mins 27 – 40</span>
+                            </div>
+                            <p class="text-xs text-slate-600 dark:text-slate-300">
+                                ~90s per VA item. Use <strong>Bidirectional Hinge Checks</strong> on Sentence Placement and Cause + Effect decomposition on Para Summary.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Real CAT Archetype Walkthroughs -->
+            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+                    <div>
+                        <h3 class="text-lg font-bold">Interactive CAT Archetype Progression & Solving Walkthroughs</h3>
+                        <p class="text-xs text-slate-500">Select a section below to inspect how real CAT 2024 & 2021 problems are deconstructed under exam timers:</p>
+                    </div>
+                    <div class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+                        <button onclick="switchWalkthrough('qa')" id="wtBtn-qa" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm transition">QA Scaling (3 Levels)</button>
+                        <button onclick="switchWalkthrough('dilr')" id="wtBtn-dilr" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 transition">DILR Tournament Triage</button>
+                        <button onclick="switchWalkthrough('varc')" id="wtBtn-varc" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 transition">VARC Hinge & Summary</button>
+                    </div>
+                </div>
+
+                <!-- QA Walkthrough Content -->
+                <div id="wtContent-qa" class="grid grid-cols-1 lg:grid-cols-3 gap-4 animate-fade">
+                    <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">Level 1: Direct (Diff 3–4)</span>
+                            <span class="font-mono text-xs text-slate-500">Target: 60–75s</span>
+                        </div>
+                        <h4 class="font-bold text-sm">CAT 2024 Slot 1: Fruit Seller Ratio</h4>
+                        <p class="text-xs italic text-slate-600 dark:text-slate-400">
+                            "In a basket of 187 fruits, apples and mangoes are in ratio 5:2. After selling 75 apples, 26 mangoes, and half the oranges, unsold apples to unsold oranges are in ratio 3:2. Find total unsold fruits."
+                        </p>
+                        <div class="text-xs space-y-1 pt-2 border-t border-slate-200 dark:border-slate-700">
+                            <p><strong>Execution:</strong> Let initial apples $= 5x$, mangoes $= 2x$, unsold oranges $= y$ (initial oranges $= 2y$). Since $(5x - 75)/y = 3/2 \Rightarrow y = \frac{2}{3}(5x - 75)$.</p>
+                            <p>Substitute into total $7x + 2y = 187 \Rightarrow 41x = 861 \Rightarrow x = 21$. Unsold fruits evaluate to <strong>66</strong>.</p>
+                            <p class="text-rose-600 dark:text-rose-400 font-medium">⚠️ Common Error: Computing sold fruits (121) instead of unsold (66).</p>
+                        </div>
+                    </div>
+
+                    <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-indigo-500/15 text-indigo-600 dark:text-indigo-400">Level 2: Applied (Diff 5–6)</span>
+                            <span class="font-mono text-xs text-slate-500">Target: 90–120s</span>
+                        </div>
+                        <h4 class="font-bold text-sm">CAT 2024: Renu & Seema Work Shift</h4>
+                        <p class="text-xs italic text-slate-600 dark:text-slate-400">
+                            "Renu takes 15 days (4 hrs/day) to finish a job; Seema takes 8 days (5 hrs/day). Together, Seema works double the hrs/day of Renu, while Renu works double the days of Seema. If Renu works 2 hrs/day, how many days does Seema work?"
+                        </p>
+                        <div class="text-xs space-y-1 pt-2 border-t border-slate-200 dark:border-slate-700">
+                            <p><strong>Execution:</strong> Renu $= 60$ man-hrs; Seema $= 40$ man-hrs. Set $W = \text{LCM}(60, 40) = 120$ units $\Rightarrow r_R = 2\text{ u/hr}, r_S = 3\text{ u/hr}$.</p>
+                            <p>Seema works $d$ days at $4\text{ hrs/day}$; Renu works $2d$ days at $2\text{ hrs/day}$. Total work: $d(4)(3) + (2d)(2)(2) = 120 \Rightarrow 20d = 120 \Rightarrow \mathbf{d = 6\text{ days}}$.</p>
+                            <p class="text-rose-600 dark:text-rose-400 font-medium">⚠️ Common Error: Reversing the ratio of days vs. hours/day.</p>
+                        </div>
+                    </div>
+
+                    <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-purple-500/15 text-purple-600 dark:text-purple-400">Level 3: Integrated (Diff 7–8)</span>
+                            <span class="font-mono text-xs text-slate-500">Target: 110–140s</span>
+                        </div>
+                        <h4 class="font-bold text-sm">CAT 2024 Slot 1: Coordinate Annulus Area</h4>
+                        <p class="text-xs italic text-slate-600 dark:text-slate-400">
+                            "Find the area in the XY-plane bounded by $y \ge x + 4$ and $-4 \le x^2 + y^2 + 4(x - y) \le 0$."
+                        </p>
+                        <div class="text-xs space-y-1 pt-2 border-t border-slate-200 dark:border-slate-700">
+                            <p><strong>Execution:</strong> Complete squares: $4 \le (x+2)^2 + (y-2)^2 \le 8$. This is an annulus centered at $(-2, 2)$ with $r_1 = 2, r_2 = \sqrt{8}$ and total area $\pi(8 - 4) = 4\pi$.</p>
+                            <p>Substitute center $(-2, 2)$ into $y = x + 4 \Rightarrow 2 = -2 + 4$. The line passes through the center and bisects the annulus! Area $= \frac{1}{2}(4\pi) = \mathbf{2\pi}$.</p>
+                            <p class="text-emerald-600 dark:text-emerald-400 font-medium">✅ Rule: Attempt immediately if center-bisection is spotted; skip if integrating chords.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DILR Walkthrough Content -->
+                <div id="wtContent-dilr" class="hidden grid-cols-1 lg:grid-cols-3 gap-4 animate-fade">
+                    <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2">
+                        <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-purple-500/15 text-purple-600 dark:text-purple-400">Step 1 • Minutes 0 to 2</span>
+                        <h4 class="font-bold text-sm">Global Structure & Invariant Check</h4>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                            In the <strong>CAT 2024 Slot 1 QUIET Tournament</strong> (6 teams in two groups of 3; intra-group once, cross-group twice), each team plays $2 + 2(3) = 8$ games $\Rightarrow (6\times 8)/2 = 24$ total games across 8 rounds of 3 games each. In <strong>CAT 2021 Chango</strong> (12 players, 4 groups of 3 + KO), $8 + 2 + 1 = 11$ total games (22 player-appearances).
+                        </p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2">
+                        <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-indigo-500/15 text-indigo-600 dark:text-indigo-400">Step 2 • Minutes 2 to 4</span>
+                        <h4 class="font-bold text-sm">Group Partitioning via Frequency Clues</h4>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                            Use repeat-pairing clues to lock groups <em>before</em> touching round schedules: any pair meeting twice must belong to different groups; any pair meeting once must belong to the same group. Once $\{1, 5, 6\}$ and $\{2, 3, 4\}$ are partitioned, <strong>Question 3 ("Odd team out among 2, 3, 4, 5") is solved immediately for +3 marks</strong>.
+                        </p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-rose-50/60 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800/60 space-y-2">
+                        <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-rose-500/15 text-rose-600 dark:text-rose-400">Step 3 • Minute 4.0 Gate</span>
+                        <h4 class="font-bold text-sm">Abandonment Decision Trigger</h4>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                            Candidates who attempt to fill Rounds 1–8 directly without fixing the group partition branch into dozens of incompatible permutations. <strong>Rule:</strong> If your master structural frame is not locked with $\ge 2$ fixed anchors by Minute 4.0, pivot immediately to your next ranked set.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- VARC Walkthrough Content -->
+                <div id="wtContent-varc" class="hidden grid-cols-1 lg:grid-cols-2 gap-4 animate-fade">
+                    <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-blue-500/15 text-blue-600 dark:text-blue-400">Sentence Placement (Diff 5–6)</span>
+                            <span class="font-mono text-xs text-slate-500">Target: 75–90s</span>
+                        </div>
+                        <h4 class="font-bold text-sm">CAT 2024 Slot 1: Renaissance Polyphonic Music</h4>
+                        <p class="text-xs italic text-slate-600 dark:text-slate-400">
+                            Target Sentence: "Comprehending a wide range of emotions, Renaissance music nevertheless portrayed all emotions in a balanced and moderate fashion."
+                        </p>
+                        <p class="text-xs text-slate-600 dark:text-slate-300">
+                            <strong>Bidirectional Hinge Check:</strong> Blanks (1) and (2) discuss the 1588 London publication of Italian madrigals. Blank (3) sits right after texture and immediately before: <em>"Extreme use of and contrasts in dynamics, rhythm, and tone colour do not occur."</em> This sentence directly elaborates on <em>"balanced and moderate fashion"</em>, locking <strong>Option (3)</strong> with 100% certainty.
+                        </p>
+                    </div>
+
+                    <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-cyan-500/15 text-cyan-600 dark:text-cyan-400">Para Summary (Diff 6–7)</span>
+                            <span class="font-mono text-xs text-slate-500">Target: 90–110s</span>
+                        </div>
+                        <h4 class="font-bold text-sm">CAT 2024 Slot 1: Cartography Usability (43.86% Error Rate)</h4>
+                        <p class="text-xs italic text-slate-600 dark:text-slate-400">
+                            Passage contrasts past mapmakers (minimal usability research) with modern mapmakers (who must evaluate usability because technological developments made readers demanding).
+                        </p>
+                        <p class="text-xs text-slate-600 dark:text-slate-300">
+                            <strong>Cause + Effect Audit:</strong> Cause = technological developments making readers demanding; Core Effect = cartographers must focus on map usability. Eliminate Option 1 (narrow "innovations"), Option 2 (fabricates "series of experiments"), and Option 4 (drops technology cause), locking <strong>Option 3</strong>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 4: PROFILES & DEPENDENCY MAP          -->
+        <!-- ========================================== -->
+        <section id="view-dependencies" class="space-y-8 hidden animate-fade">
+            <!-- Profile Prioritization Selector -->
+            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-6">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Deliverable D • Profile-Specific Topic Prioritization</span>
+                        <h2 class="text-xl sm:text-2xl font-extrabold mt-0.5">Select Your Aspirant Profile</h2>
+                        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                            Optimal topic acquisition order and target attempts tailored to your mock baseline and remaining preparation window:
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="selectProfile('beginner')" id="profBtn-beginner" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-sm transition">1. Beginner (From Scratch)</button>
+                        <button onclick="selectProfile('intermediate')" id="profBtn-intermediate" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition">2. Intermediate (80–92%ile)</button>
+                        <button onclick="selectProfile('advanced')" id="profBtn-advanced" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition">3. Advanced (99.5+ Target)</button>
+                        <button onclick="selectProfile('constrained')" id="profBtn-constrained" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition">4. Time-Constrained (<45d)</button>
+                    </div>
+                </div>
+
+                <!-- Dynamic Profile Matrix Output -->
+                <div id="profileMatrixOutput" class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+
+            <!-- Cross-Topic Dependency Map (Deliverable E) -->
+            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-6">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Deliverable E • Hierarchical Skill Architecture</span>
+                    <h3 class="text-xl font-extrabold mt-0.5">Cross-Topic & Inter-Sectional Dependency Pipeline</h3>
+                    <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+                        Attempting Tier-3 synthesis chapters before automating Tier-1 foundational nodes creates severe speed bottlenecks during timed mocks.
+                    </p>
+                </div>
+
+                <div class="space-y-6">
+                    <!-- QA Dependency Flow -->
+                    <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 space-y-4">
+                        <div class="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold text-sm">
+                            <i data-lucide="calculator" class="w-4 h-4"></i>
+                            <span>Quantitative Aptitude (QA) Dependency Flow</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+                            <div class="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-emerald-500/30 shadow-sm">
+                                <div class="font-bold text-emerald-600 dark:text-emerald-400 mb-1.5">1. Foundational Nodes (Learn First)</div>
+                                <ul class="space-y-1 text-slate-600 dark:text-slate-300 list-disc list-inside">
+                                    <li>Percentages & Fractional Multipliers</li>
+                                    <li>Ratios & Proportions</li>
+                                    <li>Linear Equations</li>
+                                    <li>Prime Factorization</li>
+                                </ul>
+                            </div>
+                            <div class="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-sm">
+                                <div class="font-bold text-indigo-600 dark:text-indigo-400 mb-1.5">2. Dependent Core Unlocked</div>
+                                <ul class="space-y-1 text-slate-600 dark:text-slate-300 list-disc list-inside">
+                                    <li><strong>From % & Ratios:</strong> PLD, SI/CI, Averages, Mixtures, TSD, Time & Work</li>
+                                    <li><strong>From Linear Eq & Factors:</strong> Quadratics, Inequalities, AP/GP, HCF/LCM</li>
+                                </ul>
+                            </div>
+                            <div class="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-sm">
+                                <div class="font-bold text-purple-600 dark:text-purple-400 mb-1.5">3. High-Freq Synthesis Bridges</div>
+                                <ul class="space-y-1 text-slate-600 dark:text-slate-300 list-disc list-inside">
+                                    <li><strong>Quadratics + Logs/Surds:</strong> Radical/log equations</li>
+                                    <li><strong>Coord Geo + Modulus:</strong> Enclosed 2D graph areas</li>
+                                    <li><strong>TSD + AP/GP:</strong> Variable speed schedules</li>
+                                </ul>
+                            </div>
+                            <div class="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-sm">
+                                <div class="font-bold text-amber-600 dark:text-amber-400 mb-1.5">4. Independent vs. Deferred</div>
+                                <p class="text-slate-600 dark:text-slate-300 mb-1"><strong>Anytime:</strong> Basic Triangles, 2D/3D Mensuration, 2/3-Set Venn.</p>
+                                <p class="text-slate-500"><strong>Defer:</strong> Functions/Graphs, Euler/CRT Remainders, Bayes/Derangements.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DILR Dependency Flow -->
+                    <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 space-y-4">
+                        <div class="flex items-center gap-2 text-purple-600 dark:text-purple-400 font-bold text-sm">
+                            <i data-lucide="grid" class="w-4 h-4"></i>
+                            <span>Logical Reasoning & Data Interpretation (DILR) Dependency Flow (Includes QA Spillover)</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+                            <div class="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-purple-500/30 shadow-sm">
+                                <div class="font-bold text-purple-600 dark:text-purple-400 mb-1.5">1. Foundational Nodes (Learn First)</div>
+                                <ul class="space-y-1 text-slate-600 dark:text-slate-300 list-disc list-inside">
+                                    <li>Mental % & Ratio Comparison</li>
+                                    <li>2D Grid & Truth-Table Notation</li>
+                                    <li>Set Inclusion-Exclusion ($\cup, \cap$)</li>
+                                </ul>
+                            </div>
+                            <div class="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-sm">
+                                <div class="font-bold text-indigo-600 dark:text-indigo-400 mb-1.5">2. Dependent Core Unlocked</div>
+                                <ul class="space-y-1 text-slate-600 dark:text-slate-300 list-disc list-inside">
+                                    <li><strong>From % & Ratios:</strong> Standard & Novel Charts, Missing-Value Tables</li>
+                                    <li><strong>From Grid Notation:</strong> Linear/Circular Seating, Matrix Attribute Puzzles</li>
+                                </ul>
+                            </div>
+                            <div class="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-sm">
+                                <div class="font-bold text-fuchsia-600 dark:text-fuchsia-400 mb-1.5">3. Hybrid Synthesis Bridges</div>
+                                <ul class="space-y-1 text-slate-600 dark:text-slate-300 list-disc list-inside">
+                                    <li><strong>Matrix + Averages/Medians:</strong> $3\times 3$ Quant Number Grids</li>
+                                    <li><strong>Combinatorics + Matrix:</strong> Games & Tournaments</li>
+                                    <li><strong>Venn + Inequalities:</strong> 4-Set Maxima-Minima</li>
+                                </ul>
+                            </div>
+                            <div class="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-sm">
+                                <div class="font-bold text-amber-600 dark:text-amber-400 mb-1.5">4. Independent vs. Deferred</div>
+                                <p class="text-slate-600 dark:text-slate-300 mb-1"><strong>Anytime:</strong> Candlestick/Scatter/Radar Legend Decoding, Basic Network Flow.</p>
+                                <p class="text-slate-500"><strong>Defer:</strong> Dynamic Counter Queues, Binary Alternators, Betting Games.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VARC Dependency Flow -->
+                    <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 space-y-4">
+                        <div class="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-bold text-sm">
+                            <i data-lucide="book-open" class="w-4 h-4"></i>
+                            <span>Verbal Ability & Reading Comprehension (VARC) Dependency Flow</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+                            <div class="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-blue-500/30 shadow-sm">
+                                <div class="font-bold text-blue-600 dark:text-blue-400 mb-1.5">1. Foundational Nodes (Learn First)</div>
+                                <ul class="space-y-1 text-slate-600 dark:text-slate-300 list-disc list-inside">
+                                    <li>Active Structural Reading & Pacing</li>
+                                    <li>Claim vs. Support Differentiation</li>
+                                    <li>Referential & Transition Links</li>
+                                </ul>
+                            </div>
+                            <div class="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-sm">
+                                <div class="font-bold text-indigo-600 dark:text-indigo-400 mb-1.5">2. Dependent Core Unlocked</div>
+                                <ul class="space-y-1 text-slate-600 dark:text-slate-300 list-disc list-inside">
+                                    <li><strong>From Claim Tracking:</strong> RC Main Idea, Primary Purpose, Para Summary (600w vs 100w)</li>
+                                    <li><strong>From Transitions:</strong> Sentence Placement, Odd Sentence Out</li>
+                                </ul>
+                            </div>
+                            <div class="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-sm">
+                                <div class="font-bold text-cyan-600 dark:text-cyan-400 mb-1.5">3. Advanced Synthesis Bridges</div>
+                                <ul class="space-y-1 text-slate-600 dark:text-slate-300 list-disc list-inside">
+                                    <li><strong>Main Idea + Formal Logic:</strong> Critical Argumentation in RC (Strengthen/Weaken)</li>
+                                    <li><strong>Placement + Chronology:</strong> 4-Sentence TITA Para Jumbles</li>
+                                </ul>
+                            </div>
+                            <div class="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-sm">
+                                <div class="font-bold text-amber-600 dark:text-amber-400 mb-1.5">4. Independent vs. Deferred</div>
+                                <p class="text-slate-600 dark:text-slate-300 mb-1"><strong>Anytime:</strong> Contextual Idiom Deduction, 12 Academic Genre Familiarization.</p>
+                                <p class="text-slate-500"><strong>Defer:</strong> Double-Negative RC Stems, High-Abstractness TITA Jumbles.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 5: PREPARATION ROADMAPS               -->
+        <!-- ========================================== -->
+        <section id="view-roadmaps" class="space-y-8 hidden animate-fade">
+            <!-- Daily Commitment Switcher -->
+            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-5">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Deliverable F • Adaptable Time-Allocation Models</span>
+                        <h2 class="text-xl sm:text-2xl font-extrabold mt-0.5">Daily Schedule & Preparation Roadmaps (180, 90, 60 & 30 Days)</h2>
+                        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                            Toggle your daily commitment model and remaining preparation timeline below:
+                        </p>
+                    </div>
+                    <div class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+                        <button onclick="switchDailyModel('working')" id="dailyBtn-working" class="px-3.5 py-2 rounded-lg text-xs font-bold bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm transition">Working / Student (3h/Weekday)</button>
+                        <button onclick="switchDailyModel('fulltime')" id="dailyBtn-fulltime" class="px-3.5 py-2 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 transition">Full-Time Aspirant (6h/Weekday)</button>
+                    </div>
+                </div>
+
+                <!-- Dynamic Daily Schedule Blocks -->
+                <div id="dailyScheduleBlocks" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+
+            <!-- Roadmap Horizon Selector -->
+            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-6">
+                <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="selectRoadmap('180')" id="rmBtn-180" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-indigo-600 text-white shadow-sm transition">180-Day Comprehensive (26 Wks)</button>
+                        <button onclick="selectRoadmap('90')" id="rmBtn-90" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition">90-Day Balanced Mastery (13 Wks)</button>
+                        <button onclick="selectRoadmap('60')" id="rmBtn-60" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition">60-Day Accelerated (8.5 Wks)</button>
+                        <button onclick="selectRoadmap('30')" id="rmBtn-30" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 transition">30-Day Emergency Pareto (4 Wks)</button>
+                    </div>
+                    <div class="text-xs text-slate-500 font-medium">
+                        Sectional Budget: <strong>Beginners</strong> (40% QA / 35% DILR / 25% VARC) • <strong>Repeaters</strong> (35% QA / 40% DILR / 25% VARC)
+                    </div>
+                </div>
+
+                <!-- Dynamic Roadmap Phases Container -->
+                <div id="roadmapPhasesContainer" class="space-y-4">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 6: PERCENTILE SIMULATOR & ANALYTICS   -->
+        <!-- ========================================== -->
+        <section id="view-analytics" class="space-y-8 hidden animate-fade">
+            <!-- Interactive Multi-Year Score-to-Percentile Simulator -->
+            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+                <div class="mb-6">
+                    <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Deliverable G • Empirical Score-to-Percentile Interpreter</span>
+                    <h2 class="text-xl sm:text-2xl font-extrabold mt-0.5">Interactive 3-Mock Rolling Score & Percentile Simulator</h2>
+                    <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+                        Adjust your sectional raw scores below to benchmark your expected percentile band across all three historical CAT difficulty regimes: <strong>CAT 2023 (Tough Bound)</strong>, <strong>CAT 2025 (Median Bound)</strong>, and <strong>CAT 2024 (Accessible Bound)</strong>.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                    <!-- Sliders Input Column -->
+                    <div class="lg:col-span-6 space-y-5 bg-slate-50 dark:bg-slate-800/50 p-5 rounded-2xl border border-slate-200 dark:border-slate-800">
+                        <!-- VARC Slider -->
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between text-xs sm:text-sm font-bold">
+                                <span class="text-blue-600 dark:text-blue-400">VARC Scaled/Raw Score (Out of 72)</span>
+                                <span id="simVarcVal" class="font-mono text-base">42 Marks (~14 Net Correct)</span>
+                            </div>
+                            <input type="range" id="simVarcSlider" min="0" max="72" value="42" oninput="updatePercentileSimulator()" class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg cursor-pointer">
+                            <div class="flex justify-between text-[11px] text-slate-400 font-mono">
+                                <span>0M</span>
+                                <span>80%ile (~19M)</span>
+                                <span>90%ile (~26M)</span>
+                                <span>99%ile (~44M)</span>
+                                <span>72M</span>
+                            </div>
+                        </div>
+
+                        <!-- DILR Slider -->
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between text-xs sm:text-sm font-bold">
+                                <span class="text-purple-600 dark:text-purple-400">DILR Scaled/Raw Score (Out of 66)</span>
+                                <span id="simDilrVal" class="font-mono text-base">30 Marks (~2.5 Sets Solved)</span>
+                            </div>
+                            <input type="range" id="simDilrSlider" min="0" max="66" value="30" oninput="updatePercentileSimulator()" class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg cursor-pointer">
+                            <div class="flex justify-between text-[11px] text-slate-400 font-mono">
+                                <span>0M</span>
+                                <span>80%ile (~12M)</span>
+                                <span>90%ile (~17M)</span>
+                                <span>99%ile (~30M)</span>
+                                <span>66M</span>
+                            </div>
+                        </div>
+
+                        <!-- QA Slider -->
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between text-xs sm:text-sm font-bold">
+                                <span class="text-emerald-600 dark:text-emerald-400">QA Scaled/Raw Score (Out of 66)</span>
+                                <span id="simQaVal" class="font-mono text-base">28 Marks (~9.5 Net Correct)</span>
+                            </div>
+                            <input type="range" id="simQaSlider" min="0" max="66" value="28" oninput="updatePercentileSimulator()" class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg cursor-pointer">
+                            <div class="flex justify-between text-[11px] text-slate-400 font-mono">
+                                <span>0M</span>
+                                <span>80%ile (~10M)</span>
+                                <span>90%ile (~15M)</span>
+                                <span>99%ile (~28M)</span>
+                                <span>66M</span>
+                            </div>
+                        </div>
+
+                        <!-- Preset Buttons -->
+                        <div class="pt-2 flex flex-wrap items-center gap-2">
+                            <span class="text-xs text-slate-400">Quick Presets:</span>
+                            <button onclick="setSimPreset(44, 30, 28)" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/20 transition">P1+P2 Mastery (102M)</button>
+                            <button onclick="setSimPreset(44, 30, 11)" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 transition">Skewed QA Cutoff Risk (85M)</button>
+                            <button onclick="setSimPreset(32, 22, 19)" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 transition">Balanced 95%ile (73M)</button>
+                        </div>
+                    </div>
+
+                    <!-- Output Benchmarks Column -->
+                    <div class="lg:col-span-6 space-y-4">
+                        <div class="p-5 rounded-2xl bg-gradient-to-br from-indigo-950 via-slate-900 to-slate-900 text-white border border-indigo-500/30 shadow-lg">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <span class="text-xs uppercase tracking-wider text-indigo-300 font-semibold">Simulated Total Score</span>
+                                    <div id="simTotalScore" class="text-3xl sm:text-4xl font-extrabold font-mono mt-0.5">100 / 204 <span class="text-sm font-normal text-slate-300">(49.0% Marks)</span></div>
+                                </div>
+                                <div id="simCutoffBadge" class="px-3 py-1.5 rounded-xl bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-bold">
+                                    ✅ All Sectional Cutoffs Cleared
+                                </div>
+                            </div>
+
+                            <!-- 3 Regime Outputs -->
+                            <div class="grid grid-cols-3 gap-3 pt-3 border-t border-white/10">
+                                <div class="p-3 rounded-xl bg-white/5 border border-white/10">
+                                    <div class="text-[11px] text-slate-400">CAT 2023 (Tough Paper)</div>
+                                    <div id="simPct2023" class="text-lg sm:text-xl font-extrabold font-mono text-emerald-400 mt-0.5">99.8+ %ile</div>
+                                </div>
+                                <div class="p-3 rounded-xl bg-indigo-500/20 border border-indigo-400/40">
+                                    <div class="text-[11px] text-indigo-200 font-semibold">CAT 2025 (Median Paper)</div>
+                                    <div id="simPct2025" class="text-lg sm:text-xl font-extrabold font-mono text-white mt-0.5">99.6 %ile</div>
+                                </div>
+                                <div class="p-3 rounded-xl bg-white/5 border border-white/10">
+                                    <div class="text-[11px] text-slate-400">CAT 2024 (Accessible)</div>
+                                    <div id="simPct2024" class="text-lg sm:text-xl font-extrabold font-mono text-cyan-300 mt-0.5">99.2 %ile</div>
+                                </div>
+                            </div>
+
+                            <!-- Sectional Percentile Breakdown -->
+                            <div id="simSectionalBreakdown" class="mt-4 pt-3 border-t border-white/10 text-xs text-slate-300 flex flex-wrap justify-between gap-2 font-mono">
+                                <!-- Populated via JS -->
+                            </div>
+                        </div>
+
+                        <!-- Multi-Year Reference Table -->
+                        <div class="overflow-x-auto bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-200 dark:border-slate-800 p-3">
+                            <table class="w-full text-left text-xs font-mono">
+                                <thead>
+                                    <tr class="text-slate-500 border-b border-slate-200 dark:border-slate-700">
+                                        <th class="py-1.5 px-2">Percentile</th>
+                                        <th class="py-1.5 px-2">CAT '25 (Overall / V / D / Q)</th>
+                                        <th class="py-1.5 px-2">CAT '24 (Overall / V / D / Q)</th>
+                                        <th class="py-1.5 px-2">CAT '23 (Out of 198)</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-200/50 dark:divide-slate-800">
+                                    <tr>
+                                        <td class="py-1.5 px-2 font-bold text-indigo-600 dark:text-indigo-400">99.9%ile</td>
+                                        <td class="py-1.5 px-2">111.5 (53 / 38 / 37)</td>
+                                        <td class="py-1.5 px-2">127.0 (55 / 50 / 45)</td>
+                                        <td class="py-1.5 px-2">103.0 (51 / 37 / 35)</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-1.5 px-2 font-bold text-indigo-600 dark:text-indigo-400">99.5%ile</td>
+                                        <td class="py-1.5 px-2">93.0 (48 / 33 / 31.2)</td>
+                                        <td class="py-1.5 px-2">104.0 (44 / 41.4 / 36.5)</td>
+                                        <td class="py-1.5 px-2">~91.0 (44 / 30.6 / 28.3)</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-1.5 px-2 font-bold text-emerald-600 dark:text-emerald-400">99.0%ile</td>
+                                        <td class="py-1.5 px-2">84.8 (44 / 29.8 / 27.3)</td>
+                                        <td class="py-1.5 px-2">95.1 (40.3 / 37.8 / 33)</td>
+                                        <td class="py-1.5 px-2">79–84 (39.8 / 27.3 / 25.2)</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-1.5 px-2 font-bold">95.0%ile</td>
+                                        <td class="py-1.5 px-2">62.3 (32.5 / 21.5 / 18.5)</td>
+                                        <td class="py-1.5 px-2">70.0 (30 / 27 / 22)</td>
+                                        <td class="py-1.5 px-2">~54.0 (28.8 / 18.9 / 16.9)</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-1.5 px-2 font-bold">90.0%ile</td>
+                                        <td class="py-1.5 px-2">51.5 (26 / 16.7 / 15)</td>
+                                        <td class="py-1.5 px-2">58.0 (24 / 22.5 / 17)</td>
+                                        <td class="py-1.5 px-2">~45.0 (23.4 / 15.6 / 13.6)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 10-Category Diagnostic Error Taxonomy & 18-Column CSV Generator -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Error Taxonomy Explorer -->
+                <div class="lg:col-span-7 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-bold">10-Category Diagnostic Error Taxonomy (E01–E10)</h3>
+                            <p class="text-xs text-slate-500">Click any error code during your 3-hour post-mock audit to view its mandatory corrective rule:</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-2" id="errorTaxonomyButtons">
+                        <!-- Populated via JS -->
+                    </div>
+                    <div id="errorTaxonomyDetail" class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 space-y-2">
+                        <!-- Populated via JS -->
+                    </div>
+                </div>
+
+                <!-- 18-Column Schema & CSV Export -->
+                <div class="lg:col-span-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm flex flex-col justify-between space-y-4">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-lg font-bold">18-Field Mock Analytics Schema</h3>
+                            <span class="px-2 py-0.5 rounded text-xs font-mono bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">Spreadsheet-Ready</span>
+                        </div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">
+                            Separate <strong>Question-Level KPIs</strong> (QA/VA MPM $\ge 0.50$, Unseen Sitter Rate) from <strong>Set-Level KPIs</strong> (DILR Set Conversion $\ge 75\%$, Sunk-Cost Time Bleed $<10\%$).
+                        </p>
+                        <div class="max-h-48 overflow-y-auto bg-slate-50 dark:bg-slate-800/60 rounded-xl p-3 border border-slate-200 dark:border-slate-700 text-xs font-mono space-y-1">
+                            <div><span class="text-indigo-500">Col A–C:</span> Date, Mock_ID, Section (VARC/DILR/QA)</div>
+                            <div><span class="text-indigo-500">Col D–F:</span> Topic, Subtopic, Question_or_Set_ID</div>
+                            <div><span class="text-indigo-500">Col G–I:</span> Difficulty (1-10), Attempt_Status, Outcome</div>
+                            <div><span class="text-indigo-500">Col J–L:</span> Time_Spent (Sec), Marks (+3/-1/0), Accuracy</div>
+                            <div><span class="text-indigo-500">Col M–O:</span> Error_Category (E01-E10), Root_Cause, Solvable_Status</div>
+                            <div><span class="text-indigo-500">Col P–R:</span> Revision_Req, Next_Review_Date, Recommended_Action</div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap gap-2 pt-2">
+                        <button onclick="copyMockSchemaHeaders()" class="flex-1 py-2.5 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow-sm transition">
+                            <i data-lucide="copy" class="w-4 h-4"></i>
+                            <span id="copySchemaBtnText">Copy 18 Tab-Separated Headers</span>
+                        </button>
+                        <button onclick="downloadMockCsvTemplate()" class="py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-xs flex items-center justify-center gap-1.5 transition">
+                            <i data-lucide="download" class="w-4 h-4"></i>
+                            <span>Download .CSV</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 py-6 px-4 lg:px-8 mt-12">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
+            <div>
+                <strong>Deliverable H — Empirical Evidence Baseline:</strong> Anchored in Official CAT 2018–2025 Papers, Candidate Response Sheets, IIM Normalization Frameworks, and Multi-Institute Slot Analyses (512 DILR Qs; 15 standardized 40-min slots).
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="resetMasteryProgress()" class="text-rose-500 hover:underline">Reset Saved Progress</button>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const INSTITUTES_DATA = {
+            IIMA: {
+                name: "IIM Ahmedabad",
+                catWeight: "65%",
+                c10: "10%",
+                c12: "10%",
+                grad: "10%",
+                div: "5%",
+                work: "App Rating",
+                note: "Balanced sectionals (85+%ile) + 99.5+ overall required for General pool."
+            },
+            IIMB: {
+                name: "IIM Bangalore",
+                catWeight: "55% (Sectional Weighted)",
+                c10: "10%",
+                c12: "10%",
+                grad: "10%",
+                div: "5%",
+                work: "10%",
+                note: "Heavily rewards consistent 90+ board/graduation marks and professional work tenure."
+            },
+            IIMC: {
+                name: "IIM Calcutta",
+                catWeight: "56%",
+                c10: "10%",
+                c12: "15%",
+                grad: "0%",
+                div: "4%",
+                work: "15%",
+                note: "0% graduation weight makes it highly forgiving of undergrad CPI; demands 99.5+ CAT score."
+            },
+            IIMK: {
+                name: "IIM Kozhikode",
+                catWeight: "45%–50%",
+                c10: "15%–25%",
+                c12: "15%–20%",
+                grad: "0%",
+                div: "10%",
+                work: "5%",
+                note: "Strong emphasis on gender/academic diversity (up to 10%) and Class 10/12 marks."
+            },
+            FMS: {
+                name: "FMS Delhi",
+                catWeight: "100% (Weighted Sectional)",
+                c10: "0%",
+                c12: "0%",
+                grad: "0%",
+                div: "+5 Marks (Women)",
+                work: "0%",
+                note: "Pure CAT score play; VARC carries 40% weight in the FMS Composite Score index."
+            }
+        };
+
+        const SYLLABUS_ITEMS = [
+            // === QUANTITATIVE APTITUDE (21 SUBTOPICS) ===
+            {
+                id: "qa-1", section: "QA", domain: "Arithmetic", name: "Averages, Ratio & Proportion",
+                spi: 9.4, priority: "P1", histQs: "~38 Qs (15 Slots)", slotRange: "2.0–3.5 Qs", share: 11.4,
+                trend: "Increasing", diff: "3 / 4 / 7", diffAvg: 4, driver: "I, M", prepHours: "6h / 16h", practiceVol: "150 Qs",
+                concepts: "Compound ratios, componendo-dividendo, direct/inverse variation, assumed-mean deviation, group replacement, median/mode bounds.",
+                archetype: "Initial ratio a:b:c altered by absolute additions/removals (CAT 2024 fruit seller problem); change in average when members join/leave.",
+                trap: "Answering for sold vs. unsold remainder; missing integer divisibility constraints."
+            },
+            {
+                id: "qa-2", section: "QA", domain: "Arithmetic", name: "Percentages & Growth",
+                spi: 9.1, priority: "P1", histQs: "~23 Qs (15 Slots)", slotRange: "1.0–2.0 Qs", share: 6.8,
+                trend: "Stable", diff: "2 / 4 / 6", diffAvg: 4, driver: "M, I", prepHours: "5h / 12h", practiceVol: "120 Qs",
+                concepts: "Fractional equivalents, successive percentage change, base-change reversals, product constancy (E = P × C), depreciation.",
+                archetype: "Multi-person income/rent percentage contributions (CAT 2024 Kamal, Amal, Vimal rent share); election validity.",
+                trap: "Asymmetric base shifts (+20% then -20% ≠ 0%); compounding vs. linear growth."
+            },
+            {
+                id: "qa-3", section: "QA", domain: "Arithmetic", name: "Time & Work / Pipes & Cisterns",
+                spi: 8.9, priority: "P1", histQs: "~23 Qs (15 Slots)", slotRange: "1.0–2.0 Qs", share: 6.8,
+                trend: "Increasing", diff: "3 / 4 / 7", diffAvg: 4, driver: "I, M", prepHours: "5h / 14h", practiceVol: "120 Qs",
+                concepts: "Efficiency ratios, LCM total-work method, man-days-hours (M1D1H1/W1), alternating work, negative work (leaks).",
+                archetype: "Proportional shifts in daily hours and days worked (CAT 2024 Renu & Seema task completion); workers tiring in AP/GP.",
+                trap: "Premature cycle rounding in alternating work with emptying pipes; swapping hours vs. days."
+            },
+            {
+                id: "qa-4", section: "QA", domain: "Algebra", name: "Linear & Simultaneous Equations",
+                spi: 8.8, priority: "P1", histQs: "~28 Qs (15 Slots)", slotRange: "1.5–2.5 Qs", share: 8.3,
+                trend: "Increasing", diff: "3 / 4 / 7", diffAvg: 4, driver: "I, S", prepHours: "5h / 14h", practiceVol: "120 Qs",
+                concepts: "Two/three-variable systems, consistency conditions (a1/a2 = b1/b2 ≠ c1/c2), age problems, indeterminate Diophantine equations.",
+                archetype: "Word problems reducible to 2 equations in 3 unknowns constrained by positive integer values.",
+                trap: "Overlooking zero vs. positive integer distinction ('non-negative' includes 0 vs. 'natural/positive')."
+            },
+            {
+                id: "qa-5", section: "QA", domain: "Algebra", name: "Logarithms, Surds & Indices",
+                spi: 8.7, priority: "P1", histQs: "~20 Qs (15 Slots)", slotRange: "1.0–2.0 Qs", share: 6.1,
+                trend: "Stable", diff: "5 / 5 / 7", diffAvg: 5, driver: "C, M", prepHours: "6h / 14h", practiceVol: "120 Qs",
+                concepts: "Laws of indices, nested radical rationalization (√(a ± b√n)), base-change theorem, logarithmic equations & inequalities.",
+                archetype: "Solving for real values of k in exponential equations or maximizing integer parameters in nested surds (CAT 2024).",
+                trap: "Extraneous roots where log argument ≤ 0 or base = 1; missing composite square absorptions."
+            },
+            {
+                id: "qa-6", section: "QA", domain: "Arithmetic", name: "Mixtures & Alligation",
+                spi: 8.6, priority: "P1", histQs: "~18 Qs (15 Slots)", slotRange: "1.0–1.5 Qs", share: 5.3,
+                trend: "Stable", diff: "4 / 5 / 8", diffAvg: 5, driver: "C, I", prepHours: "5h / 12h", practiceVol: "100 Qs",
+                concepts: "Two/three-vessel alligation rule, weighted concentration, iterative liquid replacement Cn = C0(1 - R/V)^n, alloy purity.",
+                archetype: "Mixing solutions of x% and y% concentration in ratio m:n followed by partial withdrawal and refilling.",
+                trap: "Using initial volume V instead of reduced volume in iterative replacement; ratio inversion."
+            },
+            {
+                id: "qa-7", section: "QA", domain: "Arithmetic", name: "Profit, Loss & Discount (PLD)",
+                spi: 8.5, priority: "P1", histQs: "~20 Qs (15 Slots)", slotRange: "1.0–2.0 Qs", share: 6.1,
+                trend: "Stable", diff: "3 / 5 / 7", diffAvg: 5, driver: "I, M", prepHours: "6h / 15h", practiceVol: "130 Qs",
+                concepts: "CP, SP, MP linkage, multiplying factors, dishonest dealer faulty weights, break-even inventory batches.",
+                archetype: "Sequential markup and discount percentages with fixed rupee profit; tiered profit across partial inventory batches.",
+                trap: "Applying discount on CP instead of MP; inverting faulty weight ratios (800g for 1000g)."
+            },
+            {
+                id: "qa-8", section: "QA", domain: "Algebra", name: "Quadratic & Polynomial Equations",
+                spi: 8.5, priority: "P1", histQs: "~25 Qs (15 Slots)", slotRange: "1.0–2.5 Qs", share: 7.6,
+                trend: "Stable", diff: "5 / 5 / 8", diffAvg: 5, driver: "C", prepHours: "6h / 16h", practiceVol: "140 Qs",
+                concepts: "Vieta's root-coefficient relations, discriminant (D = b² - 4ac), vertex maxima/minima, factor/remainder theorems.",
+                archetype: "Finding sum of squares/cubes of roots, common roots between two quadratics, or integer root conditions.",
+                trap: "Failing to verify whether derived roots satisfy discriminant D ≥ 0 or denominator ≠ 0."
+            },
+            {
+                id: "qa-9", section: "QA", domain: "Algebra", name: "Inequalities & Modulus",
+                spi: 8.3, priority: "P1", histQs: "~28 Qs (15 Slots)", slotRange: "1.5–2.5 Qs", share: 8.3,
+                trend: "Increasing", diff: "6 / 6 / 9", diffAvg: 6, driver: "C, S", prepHours: "8h / 20h", practiceVol: "160 Qs",
+                concepts: "Wavy-curve method, AM-GM-HM optimization, absolute value equations, piecewise modulus graphs (|x-a| + |x-b|).",
+                archetype: "Counting integral solutions to rational/modulus inequalities or finding minimum value of multi-term expressions.",
+                trap: "Cross-multiplying variable denominators without knowing sign; missing boundary equality cases."
+            },
+            {
+                id: "qa-10", section: "QA", domain: "Arithmetic", name: "Time, Speed & Distance (TSD)",
+                spi: 8.2, priority: "P1", histQs: "~30 Qs (15 Slots)", slotRange: "1.5–2.5 Qs", share: 9.1,
+                trend: "Stable", diff: "5 / 6 / 9", diffAvg: 6, driver: "C, S", prepHours: "10h / 24h", practiceVol: "180 Qs",
+                concepts: "Harmonic mean speed, relative speed, linear races, circular tracks, trains, boats & streams, escalators, clocks.",
+                archetype: "Two or three runners meeting on a circular track; upstream/downstream round-trip equations; train passings.",
+                trap: "Taking arithmetic mean instead of harmonic mean for average speed; circular track direction flips."
+            },
+            {
+                id: "qa-11", section: "QA", domain: "Algebra", name: "Sequences, Series & AP/GP",
+                spi: 8.0, priority: "P2", histQs: "~23 Qs (15 Slots)", slotRange: "1.0–2.0 Qs", share: 6.8,
+                trend: "Stable", diff: "5 / 6 / 8", diffAvg: 6, driver: "C, S", prepHours: "7h / 18h", practiceVol: "140 Qs",
+                concepts: "AP, GP, HP, AGP, n-th term & sum formulas, telescoping series (partial fractions), ∑n, ∑n², ∑n³.",
+                archetype: "Finding Sn when general term Tn or recursive relation Tn = aTn-1 + b is given.",
+                trap: "Off-by-one term counting in telescoping cancellations; assuming r > 0 when r can be negative in GP."
+            },
+            {
+                id: "qa-12", section: "QA", domain: "Geometry", name: "Triangles, Lines & Circles",
+                spi: 7.9, priority: "P2", histQs: "~25 Qs (15 Slots)", slotRange: "1.5–2.0 Qs", share: 7.6,
+                trend: "Stable", diff: "6 / 6 / 8", diffAvg: 6, driver: "C", prepHours: "10h / 24h", practiceVol: "160 Qs",
+                concepts: "4 centers (I, C, O, G), similarity/congruence, Thales, Apollonius, chord-arc & tangent-secant power of a point.",
+                archetype: "Ratio of areas of sub-triangles using similarity, median lengths, or chord length when tangents intersect.",
+                trap: "Assuming a triangle is right/isosceles from visual drawing; confusing area ratio (k²) with side ratio (k)."
+            },
+            {
+                id: "qa-13", section: "QA", domain: "Arithmetic", name: "Simple & Compound Interest",
+                spi: 7.8, priority: "P2", histQs: "~15 Qs (15 Slots)", slotRange: "0.5–1.5 Qs", share: 4.5,
+                trend: "Stable", diff: "3 / 5 / 7", diffAvg: 5, driver: "M", prepHours: "4h / 10h", practiceVol: "90 Qs",
+                concepts: "SI vs. CI divergence over 2–4 years, half-yearly compounding, effective annual yield, present value, installments.",
+                archetype: "Splitting a principal into two schemes (one SI, one CI) yielding equal maturity or specified interest difference.",
+                trap: "Half-yearly rate/period halving errors; computing interest on installments from end instead of start."
+            },
+            {
+                id: "qa-14", section: "QA", domain: "Number Systems", name: "Factors, Multiples & Divisibility",
+                spi: 7.7, priority: "P2", histQs: "~18 Qs (15 Slots)", slotRange: "1.0–2.0 Qs", share: 5.3,
+                trend: "Increasing", diff: "5 / 6 / 8", diffAvg: 6, driver: "C, S", prepHours: "7h / 16h", practiceVol: "130 Qs",
+                concepts: "Divisibility rules (2^n, 3, 7, 9, 11, 13), prime factorization, count/sum/product of factors, HCF & LCM, parity.",
+                archetype: "Counting factors of N that are perfect squares or multiples of k; Diophantine factor equations (xy + ax + by = c).",
+                trap: "Failing to divide ordered factor pairs by 2 when unordered pairs are requested; missing negative divisors."
+            },
+            {
+                id: "qa-15", section: "QA", domain: "Geometry", name: "Mensuration (2D & 3D)",
+                spi: 7.6, priority: "P2", histQs: "~13 Qs (15 Slots)", slotRange: "0.5–1.5 Qs", share: 3.8,
+                trend: "Stable", diff: "4 / 5 / 7", diffAvg: 5, driver: "M, C", prepHours: "5h / 12h", practiceVol: "100 Qs",
+                concepts: "Perimeter, surface area, volume, and space diagonals of cubes, cylinders, cones, spheres, frustums, pyramids.",
+                archetype: "Melting and recasting solids; percentage change in volume/surface area; frustum of a cone water depth.",
+                trap: "Using slant height l instead of vertical height h in cones/pyramids; forgetting internal hollow surface area."
+            },
+            {
+                id: "qa-16", section: "QA", domain: "Geometry", name: "Quadrilaterals & Polygons",
+                spi: 7.5, priority: "P2", histQs: "~10 Qs (15 Slots)", slotRange: "0.5–1.0 Qs", share: 3.0,
+                trend: "Stable", diff: "5 / 5 / 7", diffAvg: 5, driver: "C", prepHours: "5h / 12h", practiceVol: "90 Qs",
+                concepts: "Squares, rhombuses, parallelograms, trapeziums, cyclic quadrilaterals, regular n-gon angles & diagonals.",
+                archetype: "Area partitioning in trapeziums/parallelograms; counting diagonals or sub-triangles in regular polygons (CAT 2024 S3).",
+                trap: "Confusing interior angle sum (n-2)180° with single angle; counting sides as diagonals in n(n-3)/2."
+            },
+            {
+                id: "qa-17", section: "QA", domain: "Geometry", name: "Coordinate Geometry & Trig",
+                spi: 7.2, priority: "P3", histQs: "~13 Qs (15 Slots)", slotRange: "0.5–1.5 Qs", share: 3.8,
+                trend: "Inconsistent", diff: "5 / 6 / 8", diffAvg: 6, driver: "C, M", prepHours: "6h / 15h", practiceVol: "100 Qs",
+                concepts: "Distance, section, slope, point-to-line distance, shoelace polygon area, circle equations, basic heights/distances.",
+                archetype: "Area enclosed by lines and circles in the XY-plane (CAT 2024 Slot 1); reflection of a point across a line.",
+                trap: "Sign errors in completing squares for circle centers; missing quadrant sign shifts in inequalities."
+            },
+            {
+                id: "qa-18", section: "QA", domain: "Algebra", name: "Functions & Graphs",
+                spi: 6.8, priority: "P3", histQs: "~15 Qs (15 Slots)", slotRange: "0.5–2.0 Qs", share: 4.5,
+                trend: "Inconsistent", diff: "7 / 7 / 9", diffAvg: 7, driver: "C", prepHours: "8h / 20h", practiceVol: "120 Qs",
+                concepts: "Domain/range, composite f(g(x)), inverse functions, greatest integer ⌊x⌋, functional equations, graph shifts.",
+                archetype: "Recursive evaluation of f(n) from f(x+y) = f(x) + f(y) + xy or finding minimum of max(f(x), g(x)).",
+                trap: "Domain restrictions in inverse/composite functions; miscounting lattice points on graphs."
+            },
+            {
+                id: "qa-19", section: "QA", domain: "Number Systems", name: "Remainders, Cyclicity & Base",
+                spi: 6.4, priority: "P3", histQs: "~10 Qs (15 Slots)", slotRange: "0.5–1.5 Qs", share: 3.0,
+                trend: "Inconsistent", diff: "7 / 7 / 9", diffAvg: 7, driver: "C", prepHours: "8h / 18h", practiceVol: "100 Qs",
+                concepts: "Modular arithmetic, negative remainders, Euler/Fermat/CRT, units/last-two digits, Legendre's n! zeros, base systems.",
+                archetype: "Finding remainder of a^b (mod m), trailing zeros in factorials, or base-system (b-ary) arithmetic equations.",
+                trap: "Applying Euler's theorem when base and divisor are not coprime; confusing power cyclicity 4 with 2."
+            },
+            {
+                id: "qa-20", section: "QA", domain: "Modern Math", name: "Permutations & Combinations",
+                spi: 6.2, priority: "P3", histQs: "~10 Qs (15 Slots)", slotRange: "0.5–1.0 Qs", share: 3.0,
+                trend: "Decreasing", diff: "7 / 7 / 9", diffAvg: 7, driver: "C, S", prepHours: "8h / 20h", practiceVol: "110 Qs",
+                concepts: "Fundamental counting, circular P&C, identical object distribution C(n+r-1, r-1), derangements, grid paths.",
+                archetype: "Counting 4- or 5-digit numbers under digit-sum or divisibility rules; grid paths avoiding blocked nodes.",
+                trap: "Double-counting overlapping cases; allowing leading zero in n-digit number formation."
+            },
+            {
+                id: "qa-21", section: "QA", domain: "Modern Math", name: "Probability & Set Theory",
+                spi: 5.8, priority: "P4", histQs: "~5 Qs (15 Slots)", slotRange: "0.0–1.0 Qs", share: 1.5,
+                trend: "Decreasing", diff: "6 / 7 / 9", diffAvg: 7, driver: "C, I", prepHours: "6h / 15h", practiceVol: "80 Qs",
+                concepts: "Conditional probability, Bayes' theorem, independent trials, Venn inclusion-exclusion (P1 for DILR).",
+                archetype: "Multi-stage conditional probability draws or expected value in sequential games.",
+                trap: "Treating dependent selection without replacement as independent trials; misreading conditional base."
+            },
+
+            // === DATA INTERPRETATION & LOGICAL REASONING (10 SET ARCHETYPES) ===
+            {
+                id: "dilr-1", section: "DILR", domain: "Pure DI", name: "Standard & Unconventional Charts",
+                spi: 9.1, priority: "P1", histQs: "1.0–2.0 Sets/Yr", slotRange: "0.5–1.0 Set/Slot", share: 6.1,
+                trend: "Increasing", diff: "DS:3 / DT:5 / DA:7", diffAvg: 5, driver: "I, M", prepHours: "6h / 15h", practiceVol: "30 Sets",
+                concepts: "Bar/line/pie charts, financial candlestick (OHLC), 2D scatter plots, spider/radar charts, Gantt timelines.",
+                archetype: "4–5 Qs accompanied by an explanatory rule box defining how to read the visual (CAT 2024 Bloggers, GDP/Food Grains).",
+                trap: "Visual intimidation causing candidates to skip a straightforward lookup set; mixing % points with % change."
+            },
+            {
+                id: "dilr-2", section: "DILR", domain: "Pure LR", name: "Matrix & Attribute Grids",
+                spi: 9.0, priority: "P1", histQs: "2.5–3.5 Sets/Yr", slotRange: "1.0 Set/Slot", share: 18.2,
+                trend: "Stable", diff: "DS:4 / DT:6 / DA:8", diffAvg: 6, driver: "S, I", prepHours: "10h / 25h", practiceVol: "45 Sets",
+                concepts: "2D cross-tabulation matching N entities across 3–4 attributes (rooms, arrival logs, vendor contracts, departments).",
+                archetype: "Accounts for 144 of 512 DILR Qs (28.1% in 2018–2025); 4–5 Qs testing exact cell pairings or conditional conclusions.",
+                trap: "Choosing the wrong primary row/column axis or failing to write out 2–3 bounded row possibilities explicitly."
+            },
+            {
+                id: "dilr-3", section: "DILR", domain: "Pure DI", name: "Missing-Value & Logic Tables",
+                spi: 8.8, priority: "P1", histQs: "1.5–2.5 Sets/Yr", slotRange: "0.5–1.0 Set/Slot", share: 10.6,
+                trend: "Stable", diff: "DS:4 / DT:5 / DA:8", diffAvg: 5, driver: "M, I", prepHours: "8h / 20h", practiceVol: "35 Sets",
+                concepts: "Simultaneous linear equations, weighted averages, extremal bounding of missing row/column entries.",
+                archetype: "4–5 Qs where 30%–50% of company revenue/rating table cells must be reconstructed from footnote constraints.",
+                trap: "Wasting time computing every single blank cell in the table when the 4 questions only query two specific rows."
+            },
+            {
+                id: "dilr-4", section: "DILR", domain: "Hybrid LRDI", name: "Venn Diagrams & Set Maxima",
+                spi: 8.5, priority: "P1", histQs: "0.5–1.5 Sets/Yr", slotRange: "0.3–0.5 Set/Slot", share: 6.1,
+                trend: "Stable", diff: "DS:4 / DT:6 / DA:8", diffAvg: 6, driver: "C, M", prepHours: "8h / 18h", practiceVol: "30 Sets",
+                concepts: "3-set and 4-set overlapping regions, 'only/exactly/at least' constraints, maximizing/minimizing intersections.",
+                archetype: "Text caselet describing survey/facility overlaps across 100–600 entities with 4 range/TITA questions.",
+                trap: "Confusing 'A and B' (A ∩ B) with 'only A and B' (A ∩ B ∩ C'), or ignoring the exterior 'None' region."
+            },
+            {
+                id: "dilr-5", section: "DILR", domain: "Pure LR", name: "Linear & Circular Seating",
+                spi: 8.4, priority: "P1", histQs: "1.5–2.5 Sets/Yr", slotRange: "0.5–1.0 Set/Slot", share: 12.1,
+                trend: "Stable", diff: "DS:5 / DT:6 / DA:8", diffAvg: 6, driver: "S", prepHours: "8h / 20h", practiceVol: "35 Sets",
+                concepts: "Single/dual row seating, inward/outward circular tables, ordering & ranking by height/score/age, house layouts.",
+                archetype: "6 to 10 entities seated under 5 to 8 spatial and conditional constraints (e.g., CAT 2023 Houses, CAT 2025 Circular).",
+                trap: "Unanchored relative clues ('two seats between X and Y') with bidirectional facing causing 4+ sub-cases."
+            },
+            {
+                id: "dilr-6", section: "DILR", domain: "Hybrid LRDI", name: "Quant-Based Number Grids",
+                spi: 8.3, priority: "P1", histQs: "1.5–2.5 Sets/Yr", slotRange: "0.5–1.0 Set/Slot", share: 13.6,
+                trend: "Increasing", diff: "DS:6 / DT:7 / DA:9", diffAvg: 7, driver: "C, M", prepHours: "10h / 25h", practiceVol: "35 Sets",
+                concepts: "Integer partitions, mean/median/mode properties, linear inequalities, prime/composite divisibility in grids.",
+                archetype: "3×3 or n×n integer matrices (CAT 2023 Coin Sacks, ratings), ATM note combinations, author journal counts.",
+                trap: "Branching into trial-and-error guessing instead of bounding extreme row/column sums and medians algebraically first."
+            },
+            {
+                id: "dilr-7", section: "DILR", domain: "Pure LR", name: "Games & Tournaments",
+                spi: 8.2, priority: "P1", histQs: "1.5–2.5 Sets/Yr", slotRange: "0.5–1.0 Set/Slot", share: 13.6,
+                trend: "Increasing", diff: "DS:6 / DT:7 / DA:9", diffAvg: 7, driver: "C, S", prepHours: "12h / 28h", practiceVol: "40 Sets",
+                concepts: "Round-robin C(n,2), knockout brackets (n-1), seeded group hybrids, match-sum invariants (∑Wins = ∑Losses).",
+                archetype: "Partially filled tournament points table or round-by-round match log (CAT 2024 Slot 1 QUIET Tournament set).",
+                trap: "Attempting to fill round-by-round schedules before partitioning teams into groups or verifying total appearances."
+            },
+            {
+                id: "dilr-8", section: "DILR", domain: "Pure LR", name: "Scheduling & Queue Timelines",
+                spi: 7.6, priority: "P2", histQs: "1.0–2.0 Sets/Yr", slotRange: "0.5 Set/Slot", share: 9.1,
+                trend: "Increasing", diff: "DS:6 / DT:7 / DA:9", diffAvg: 7, driver: "S, I", prepHours: "10h / 24h", practiceVol: "30 Sets",
+                concepts: "Timeline Gantt mapping, bottleneck throughput analysis, modular time intervals (e.g., 30-min gates).",
+                archetype: "Tracking wait times, idle server windows, or cumulative occupancy (CAT 2023 Visa Counters, CAT 2025 Train Tickets).",
+                trap: "Miscounting boundary timestamps (whether a counter freeing at 10:15 starts the next client at 10:15 or 10:16)."
+            },
+            {
+                id: "dilr-9", section: "DILR", domain: "Pure LR", name: "Routes, Maps & Networks",
+                spi: 7.5, priority: "P2", histQs: "1.0–1.5 Sets/Yr", slotRange: "0.3–0.5 Set/Slot", share: 7.6,
+                trend: "Increasing", diff: "DS:5 / DT:7 / DA:9", diffAvg: 7, driver: "S, C", prepHours: "8h / 20h", practiceVol: "25 Sets",
+                concepts: "Graph adjacency lists, flow conservation (In = Out), Dijkstra-style path inspection, non-repeating walkways.",
+                archetype: "Schematic node-arc diagram with distance, toll, or travel-time weights (CAT 2024 Slot 2 Lake Walkways & ATM Nodes).",
+                trap: "Overlooking indirect lower-cost detours or violating vertex/edge non-repetition rules."
+            },
+            {
+                id: "dilr-10", section: "DILR", domain: "Pure LR", name: "Binary Logic / Truth-Liar",
+                spi: 6.1, priority: "P4", histQs: "0.5–1.0 Set/Yr", slotRange: "0.0–0.3 Set/Slot", share: 3.0,
+                trend: "Decreasing", diff: "DS:7 / DT:8 / DA:9", diffAvg: 8, driver: "C, S", prepHours: "6h / 14h", practiceVol: "20 Sets",
+                concepts: "Boolean consistency checks, truth-tellers/liars/alternators, binary representation (2^k diagnostic pooling).",
+                archetype: "4–5 Qs requiring state verification of 4–6 speakers or minimum pooled diagnostic blood test batches.",
+                trap: "Circular self-referential statements or failing to test all truth-value assignments systematically."
+            },
+
+            // === VERBAL ABILITY & READING COMPREHENSION (10 ARCHETYPES) ===
+            {
+                id: "varc-1", section: "VARC", domain: "RC (16 Qs)", name: "RC: Contextual Vocab & Para Function",
+                spi: 9.0, priority: "P2", histQs: "~16 Qs (15 Slots)", slotRange: "1.0–2.0 Qs", share: 4.2,
+                trend: "Stable", diff: "3 / 4 / 6", diffAvg: 4, driver: "I", prepHours: "4h / 8h", practiceVol: "Integrated in RC",
+                concepts: "Meaning of words/metaphors in context ('invading their garden plots' in CAT 2024 S1), rhetorical role of a paragraph.",
+                archetype: "4-option MCQ referencing a specific line or paragraph; fastest marks in VARC (<45 seconds/question).",
+                trap: "Choosing the literal dictionary definition of a word instead of its metaphorical function in the argument."
+            },
+            {
+                id: "varc-2", section: "VARC", domain: "RC (16 Qs)", name: "RC: Main Idea, Purpose & Tone",
+                spi: 8.9, priority: "P1", histQs: "~52 Qs (15 Slots)", slotRange: "3.0–4.0 Qs", share: 14.6,
+                trend: "Stable", diff: "4 / 5 / 7", diffAvg: 5, driver: "I", prepHours: "10h / 25h", practiceVol: "100 Passages",
+                concepts: "Central theme/essence, primary purpose, passage organization, authorial attitude vs. cited scholars (Becker vs. Piketty).",
+                archetype: "4-option MCQ anchored to the passage's overarching thesis across all 4 passages.",
+                trap: "Selecting an option that summarizes only the final paragraph or uses extreme tonal adjectives (scathing, celebratory)."
+            },
+            {
+                id: "varc-3", section: "VARC", domain: "VA (8 Qs)", name: "VA: Sentence Placement / Completion",
+                spi: 8.8, priority: "P1", histQs: "~20 Qs (9 in '24)", slotRange: "2.0–3.0 Qs", share: 10.4,
+                trend: "Increasing", diff: "4 / 5 / 7", diffAvg: 5, driver: "I, S", prepHours: "6h / 15h", practiceVol: "120 Qs",
+                concepts: "Inserting a target missing sentence into one of four numbered blanks ___(1)___ to ___(4)___ via Bidirectional Hinge Checks.",
+                archetype: "4-option MCQ (+3/-1); replaced TITA Para Jumbles across all three slots in CAT 2024 (3 Qs/slot).",
+                trap: "Checking only the backward link (sentence before blank) while ignoring whether the sentence after logically follows."
+            },
+            {
+                id: "varc-4", section: "VARC", domain: "VA (8 Qs)", name: "VA: Para Summary (MCQ)",
+                spi: 8.7, priority: "P1", histQs: "45 Qs (15 Slots)", slotRange: "3.0 Qs", share: 12.5,
+                trend: "Stable", diff: "4 / 6 / 8", diffAvg: 6, driver: "I", prepHours: "8h / 18h", practiceVol: "150 Qs",
+                concepts: "Synthesizing a 100-word academic paragraph into its exact Cause + Core Effect while preserving scope and causality.",
+                archetype: "Guaranteed 3 Qs (9 marks) per slot in every recent CAT; 4-option MCQ (+3/-1 marking).",
+                trap: "Narrow-scope trap (summarizing an example) or alien-detail injection (43.86% error rate on CAT 2024 Cartography Q)."
+            },
+            {
+                id: "varc-5", section: "VARC", domain: "RC (16 Qs)", name: "RC: Direct & Contextual Inference",
+                spi: 8.6, priority: "P1", histQs: "~82 Qs (15 Slots)", slotRange: "5.0–6.0 Qs", share: 22.9,
+                trend: "Stable", diff: "5 / 6 / 8", diffAvg: 6, driver: "I, C", prepHours: "15h / 35h", practiceVol: "120 Passages",
+                concepts: "Unstated assumptions, necessary logical deductions, cause-effect extrapolations within strict textual boundaries.",
+                archetype: "Largest single question pool in VARC (~23% of section); dictates whether a candidate crosses 40+ marks.",
+                trap: "Quantifier inflation (some → most/all) and causal reversal between correlated phenomena."
+            },
+            {
+                id: "varc-6", section: "VARC", domain: "VA (8 Qs)", name: "VA: Odd Sentence Out (TITA)",
+                spi: 8.5, priority: "P1", histQs: "~35 Qs (15 Slots)", slotRange: "2.0–3.0 Qs", share: 8.3,
+                trend: "Stable", diff: "4 / 6 / 8", diffAvg: 6, driver: "I, S", prepHours: "6h / 14h", practiceVol: "120 Qs",
+                concepts: "Identifying 1 outlier sentence among 5 jumbled sentences while implicitly sequencing the remaining 4 into a coherent paragraph.",
+                archetype: "Non-MCQ / TITA (+3/0 marking); zero negative marking with >75% accuracy when mandatory pairs are linked.",
+                trap: "Eliminating a sentence that uses contrasting transition words (however, yet) when it is actually the core pivot."
+            },
+            {
+                id: "varc-7", section: "VARC", domain: "RC (16 Qs)", name: "RC: Critical Argument (Strengthen/Weaken)",
+                spi: 7.9, priority: "P1", histQs: "~52 Qs (15 Slots)", slotRange: "3.0–4.0 Qs", share: 14.6,
+                trend: "Increasing", diff: "6 / 7 / 9", diffAvg: 7, driver: "C, I", prepHours: "12h / 28h", practiceVol: "100 Passages",
+                concepts: "Strengthening or weakening claims with new hypothetical scenarios, resolving paradoxes, parallel reasoning.",
+                archetype: "4-option MCQ introducing external facts or policy interventions (e.g., carnivore-human conflict in CAT 2024).",
+                trap: "Picking an option that validates the premise clinically but fails to connect to the specific causal mechanism debated."
+            },
+            {
+                id: "varc-8", section: "VARC", domain: "VA (8 Qs)", name: "VA: Para Jumbles (4-Sentence TITA)",
+                spi: 7.4, priority: "P2", histQs: "~27 Qs (0 in '24)", slotRange: "0.0–3.0 Qs", share: 4.2,
+                trend: "Cyclic", diff: "5 / 7 / 9", diffAvg: 7, driver: "S, I", prepHours: "8h / 18h", practiceVol: "120 Qs",
+                concepts: "Reconstructing the exact 4-digit mandatory sequence (e.g., 3142) of four unnumbered jumbled sentences.",
+                archetype: "Non-MCQ / TITA (+3/0 marking; 24 permutations). Present in 2020–2023; omitted in 2024; rotating format.",
+                trap: "Swapping chronological pairs (AB vs. BA) when both sentences share the same topic noun."
+            },
+            {
+                id: "varc-9", section: "VARC", domain: "RC (16 Qs)", name: "RC: Double-Negative / Exceptional Logic",
+                spi: 7.3, priority: "P2", histQs: "~38 Qs (15 Slots)", slotRange: "2.0–3.0 Qs", share: 10.4,
+                trend: "Increasing", diff: "7 / 7 / 9", diffAvg: 7, driver: "I, S", prepHours: "8h / 20h", practiceVol: "80 Passages",
+                concepts: "Boolean polarity translation on stems phrased as 'Which statement, if false, would be inconsistent with...' or 'All EXCEPT'.",
+                archetype: "High-time-cost 4-option MCQ requiring verification across 4 distinct regions of the passage.",
+                trap: "Double-negative inversion trap: 'If false, inconsistent' is logically equivalent to 'Must be true'."
+            },
+            {
+                id: "varc-10", section: "VARC", domain: "Legacy / OMET", name: "Standalone Grammar, Vocab & FIJ",
+                spi: 2.0, priority: "P4", histQs: "0 Qs (2020–2025)", slotRange: "0.0 Qs", share: 0.0,
+                trend: "Absent in CAT", diff: "4 / — / —", diffAvg: 4, driver: "I", prepHours: "0h (CAT)", practiceVol: "OMETs Only",
+                concepts: "Standalone sentence correction, fill-in-the-blanks, antonyms, Fact-Inference-Judgment, syllogisms.",
+                archetype: "0 questions in modern CAT (2020–2025); tested only in OMETs (XAT, SNAP, NMAT).",
+                trap: "Wasting CAT preparation hours memorizing word lists or grammar rules instead of discourse logic."
+            }
+        ];
+
+        const PROFILES_DATA = {
+            beginner: {
+                title: "1. Beginner (Starting from Scratch)",
+                objective: "Clear all sectional cutoffs (85–90%ile) by securing 7–8 correct QA Qs, 1.5–2 DILR sets, and 12–14 VARC attempts.",
+                qa: ["1. Percentages, Ratios & Averages", "2. Time & Work, Mixtures, PLD", "3. Linear & Quadratic Equations", "4. Logarithms, Surds & AP/GP", "5. Basic Triangles & Mensuration"],
+                dilr: ["1. Standard Charts (Bar, Line, Pie)", "2. Missing-Value Tables", "3. Linear & Circular Arrangements", "4. 3-Set & 4-Set Venn Diagrams", "5. Basic 2D Matrix Grids"],
+                varc: ["1. Daily Reading Across 6 Core Genres", "2. RC Main Idea & Primary Purpose", "3. Para Summary & Sentence Placement", "4. Odd Sentence Out (TITA)", "5. RC Direct Inferences"]
+            },
+            intermediate: {
+                title: "2. Intermediate (80–92%ile Mock Baseline)",
+                objective: "Push to 95–98%ile via 10–12 correct QA Qs, 2.5 solved DILR sets, and 16–18 VARC attempts at 80% accuracy.",
+                qa: ["1. TSD (Races, Tracks, Relative Speed)", "2. Inequalities & Modulus", "3. Circles, Polygons & Similarity", "4. Number System (Factors/Divisibility)", "5. SI/CI & Installments"],
+                dilr: ["1. Multi-Attribute Matrix Grids", "2. Games & Tournaments (Round-Robin/KO)", "3. Quant-Based Number Grids", "4. Unconventional Charts (Candlestick/Scatter)", "5. Scheduling & Timelines"],
+                varc: ["1. RC Critical Argumentation (Strengthen/Weaken)", "2. Distractor Elimination in Close MCQs", "3. 4-Sentence Para Jumbles", "4. Abstract Philosophy & Economics RCs"]
+            },
+            advanced: {
+                title: "3. Advanced (Targeting 99.5+ Percentile)",
+                objective: "Maximize composite score (105–130+ marks): 14–17 QA Qs, 3–4 full DILR sets, and 20–22 VARC attempts.",
+                qa: ["1. Functions, Graphs & Coordinate Area", "2. Diophantine & Integer Constraints", "3. Advanced Remainders & Base Systems", "4. P&C, Derangements & Probability", "5. Telescoping Series & Maxima-Minima"],
+                dilr: ["1. Hybrid Quant-Logic Optimization Sets", "2. Dynamic Queue & Counter Simulations", "3. Complex Network & Flow Routing", "4. Multi-Round Betting/Scoring Tournaments", "5. Rapid 3-Minute Set Triage Drills"],
+                varc: ["1. Double-Negative RC Inferences", "2. High-Speed Passage Mapping (<3.5 min/RC)", "3. Zero-Drop Para Summary & Insertion", "4. Stamina Under Dense Slot-3 Style RCs"]
+            },
+            constrained: {
+                title: "4. Time-Constrained (<45 Days Remaining)",
+                objective: "Strict Pareto Focus: secure 8–10 QA Qs, 2 clean DILR sets, and 3 RCs + 8 VA Qs for ~95–98%ile.",
+                qa: ["1. Averages, Ratios & Percentages", "2. Time & Work + Mixtures", "3. Linear/Quadratic Eq + Inequalities", "4. Logs/Surds + Basic Geometry Formulas", "⛔ Drop: P&C, Probability, Remainders"],
+                dilr: ["1. Charts & Missing Tables", "2. Matrix Grids & Arrangements", "3. Venn Diagrams", "4. Games & Tournaments Basics", "⛔ Drop: Binary Logic & Complex Queues"],
+                varc: ["1. 3 Passages per Mock (Skip Toughest RC)", "2. All 8 VA Questions (Summary, Insertion, Odd-Out)", "3. PYQ Option Elimination Drills (2021–2025)"]
+            }
+        };
+
+        const DAILY_MODELS = {
+            working: [
+                { slot: "Slot 1: Morning Block", time: "75 Mins (QA Core)", desc: "High cognitive freshness: Concept notes + 20 timed questions on current priority QA subtopic." },
+                { slot: "Slot 2: Afternoon / Commute", time: "45 Mins (VARC)", desc: "2 timed RC passages (15 min) + 4 VA questions (6 min) + 24 min option-elimination review." },
+                { slot: "Slot 3: Evening Block", time: "60 Mins (DILR)", desc: "3 timed DILR sets (36 min) + 24 min structural grid reconstruction without looking at solutions." },
+                { slot: "Weekend Adjustment (Sat/Sun)", time: "6.5 Hours / Day", desc: "Full 2-hour Mock in assigned CAT slot timing + 3-hour Mock Error Log + 1.5-hour formula/error revision." }
+            ],
+            fulltime: [
+                { slot: "Slot 1: Morning Block", time: "150 Mins (QA Deep Dive)", desc: "45 min concept/archetype study + 35–40 timed practice/PYQ problems + error logging." },
+                { slot: "Slot 2: Afternoon Block", time: "90 Mins (VARC)", desc: "30 min academic essay reading + 3 RC passages + 8 VA questions + distractor flaw audit." },
+                { slot: "Slot 3: Evening Block", time: "120 Mins (DILR)", desc: "4–5 timed DILR sets across 2 archetypes + 40-min sectional test every alternate day." },
+                { slot: "Weekend Adjustment (Sat/Sun)", time: "7.0 Hours / Day", desc: "2 Full Mocks per weekend (Sat & Sun) + 3.5-hour post-mortem analysis per mock + spaced re-solving." }
+            ]
+        };
+
+        const ROADMAPS_DATA = {
+            "180": [
+                {
+                    phase: "Phase 1: Foundational Mastery (Weeks 1–6)",
+                    split: "Beginners: 60% Concept / 40% Practice | Repeaters: 20% Concept / 80% Practice",
+                    cadence: "1 Diagnostic Mock (Wk 1) + 1 Full Mock Biweekly (Wks 2, 4, 6) + 2 Sectionals/wk",
+                    topics: "QA (45%): Percentages, Ratios, Averages, Mixtures, PLD, SI/CI, Time & Work, TSD. DILR (30%): Speed math, Standard Charts, Missing Tables, Seating, 2D Matrix Grids. VARC (25%): 45m daily reading + RC Main Idea/Purpose + Para Summary & Sentence Placement.",
+                    trigger: "Week 6 Checkpoint: ≥75% untimed Arithmetic PYQ accuracy & 2D Matrix grids in <14m. Trigger: If QA Arithmetic accuracy <60%, extend Phase 1 by 10 days."
+                },
+                {
+                    phase: "Phase 2: Core Syllabus Expansion (Weeks 7–13)",
+                    split: "Beginners: 40% Concept / 60% Practice | Repeaters: 15% Concept / 85% Timed PYQs",
+                    cadence: "1 Full Mock/wk (7 Mocks) + 3 Sectionals/wk + 2x weekly 90-min Error-Log re-solving",
+                    topics: "QA (40%): Linear/Quadratic Eq, Inequalities/Modulus, Logs/Surds, AP/GP, Triangles, Circles, Mensuration. DILR (35%): 3/4-Set Venn, Games & Tournaments, Quant Grids. VARC (25%): RC Inference & CR (Strengthen/Weaken) + Odd-Out & Para Jumbles.",
+                    trigger: "Week 13 Checkpoint: Cross 55–65 raw marks (~90–95%ile). Trigger: If DILR <15 marks across 3 consecutive mocks, shift 10% QA time to daily 40m DILR triage drills."
+                },
+                {
+                    phase: "Phase 3: Advanced Synthesis & P3/P4 Coverage (Weeks 14–20)",
+                    split: "All Profiles: 20% Concept / 50% Timed Mixed Practice / 30% Mock & Error Analysis",
+                    cadence: "2 Full Mocks/wk (14 Mocks) + 3 Sectionals/wk + 3-hr post-mortem per mock",
+                    topics: "QA (35%): Coordinate Geo, Functions/Graphs, Factors/Divisibility, Remainders, P&C, Probability. DILR (40%): Routes/Networks, Queues, Unconventional Charts, Hybrid DILR. VARC (25%): Timed 4-RC marathons (27m) + Double-Negative RC logic.",
+                    trigger: "Week 20 Checkpoint: 2–2.5 DILR sets converted; QA Round-1 scan ≤18m. Trigger: If overall mock percentile <88%ile, drop P3/P4 topics and revert 100% to P1/P2 revision."
+                },
+                {
+                    phase: "Phase 4: Peak Slot Simulation (Weeks 21–26)",
+                    split: "All Profiles: 10% Formula Revision / 40% Official PYQ Slot Simulation / 50% Error Log",
+                    cadence: "2 Full Mocks/wk (Wks 21–25); taper to 1 Mock in Wk 26 (Total: ~30–35 Mocks)",
+                    topics: "All Sections (33% each): Timed simulations of all 15 official CAT 2021–2025 slot papers under strict 40-min timers + Error Log mastery + biological clock sync.",
+                    trigger: "Final Benchmark: 3-mock rolling average of 85–105+ raw marks (~99.0–99.5+%ile), zero unseen QA sitters, 100% TITA attempt compliance."
+                }
+            ],
+            "90": [
+                {
+                    phase: "Weeks 1–4: High-Weightage P1 Core (~55% of Exam Weightage)",
+                    split: "Beginners: 45% Concept / 45% Practice / 10% Mocks | Repeaters: 15% / 60% / 25%",
+                    cadence: "1 Full Mock/wk + 2 Sectionals/wk + 2-hr Sunday Error Log audit",
+                    topics: "QA (40%): Full Arithmetic block + Linear & Quadratic Equations. DILR (35%): Standard & Novel Charts, Missing Tables, Matrix Grids, Seating, 3/4-Set Venn. VARC (25%): RC Main Idea & Inference; Para Summary & Sentence Placement.",
+                    trigger: "Week 4 Trigger: If TSD or Quadratic Equations take >3 mins/question, restrict practice strictly to CAT 2021–2025 PYQs."
+                },
+                {
+                    phase: "Weeks 5–9: High-Expected-Value P2 Core",
+                    split: "All Profiles: 25% Concept / 50% Timed Practice / 25% Mock Analysis",
+                    cadence: "2 Full Mocks/wk + 3 Sectionals/wk + 3-hr post-mock error remediation",
+                    topics: "QA (35%): Inequalities/Modulus, Logs/Surds, AP/GP, Triangles, Circles, Polygons, Mensuration, Factors/Divisibility. DILR (40%): Games & Tournaments, Quant Grids, Routes, Scheduling. VARC (25%): CR in RC, Odd Sentence Out, Para Jumbles.",
+                    trigger: "Week 9 Checkpoint: Target ≥62 raw marks (~95%ile). Freeze all P3/P4 topics if P1/P2 accuracy in Error Log is <75%."
+                },
+                {
+                    phase: "Weeks 10–13: Consolidation & Official PYQ Sprints",
+                    split: "All Profiles: 10% Revision / 45% Timed PYQ Sprints / 45% Mock & Error Review",
+                    cadence: "2–3 Full Mocks/wk (Wks 10–12); 1 Mock in Wk 13 (Total: ~20–22 Mocks)",
+                    topics: "Selective P3 coverage (Coordinate Geo, basic P&C, Functions) only if scoring >80 raw marks; complete timed execution of all 15 slots of CAT 2021–2025.",
+                    trigger: "Final Readiness: Lock in personal sectional attempt targets (e.g., 17 VARC, 2.5 DILR sets, 13 QA) based on 3-mock rolling average."
+                }
+            ],
+            "60": [
+                {
+                    phase: "Weeks 1–3: Arithmetic, Core Algebra & Fixed-Base DILR",
+                    split: "30% Fast-Track Notes / 50% Topic-Wise PYQs (2020–2025) / 20% Mocks",
+                    cadence: "2 Full Mocks/wk from Week 1 + 2 Sectionals/wk + mandatory Error Log",
+                    topics: "QA (40%): Ratios, Averages, %, Mixtures, PLD, T&W, Linear/Quad Eq, Logs/Surds. DILR (35%): Charts, Missing Tables, Matrix Grids, Seating, Venn. VARC (25%): 3 RCs/day + Summary, Placement, Odd-Out.",
+                    trigger: "Week 3 Checkpoint: Must reach ≥48 raw marks (~88–90%ile). Skip coaching level-3 handouts; solve only actual CAT PYQs."
+                },
+                {
+                    phase: "Weeks 4–6: TSD, Inequalities, Geometry & Tournaments",
+                    split: "20% Concept / 45% Timed Sectional Drills / 35% Mock & Error Analysis",
+                    cadence: "2–3 Full Mocks/wk + 3 Sectionals/wk",
+                    topics: "QA (35%): TSD, SI/CI, Inequalities/Modulus, AP/GP, Triangles, Circles, Mensuration, Factors. DILR (40%): Games & Tournaments, Quant Grids, Basic Routes. VARC (25%): 40-min sectionals executing 3 RC + 8 VA strategy.",
+                    trigger: "Week 6 Checkpoint: Target ≥65 raw marks (~95+%ile). Permanently omit P&C, Probability, Remainders, Functions, and Binary Logic."
+                },
+                {
+                    phase: "Weeks 7–8.5: Execution Polishing & Error Eradication",
+                    split: "10% Formula Deck / 45% Official PYQ Mocks / 45% Error-Log Remediation",
+                    cadence: "3 Full Mocks in Wk 7; 1 Final Mock 4 days before exam (Total: ~16–18 Mocks)",
+                    topics: "Zero new theory. Blind re-solve of every incorrect/skipped solvable item in Error Log; take CAT 2023 & CAT 2024 (6 slots) as full 2-hr dress rehearsals.",
+                    trigger: "Final Readiness: Enforce strict 4-minute abandonment rule in DILR and 120-second Round-1 rule in QA."
+                }
+            ],
+            "30": [
+                {
+                    phase: "Week 1: Highest-SPI Arithmetic & Fixed-Grid DILR",
+                    split: "25% Formula Sheets / 55% PYQ Drills / 20% Mock Analysis",
+                    cadence: "2 Full Mocks (Day 3 & Day 7) + 2-hr Error Log review per mock",
+                    topics: "QA (40%): Averages, Ratios, %, Mixtures, Time & Work (2021–2025 PYQs). DILR (35%): 3 sets/day from Charts, Missing Tables, 2D Matrix Grids. VARC (25%): 2 RCs + 4 Summaries + 4 Placements daily.",
+                    trigger: "Dropped Topics (Zero Time Spent): Remainders/Base, P&C, Probability, Functions, Coordinate Geo, Binary Logic, Complex Queues."
+                },
+                {
+                    phase: "Week 2: Commercial Arith, Core Algebra & Tournaments",
+                    split: "20% Concept / 50% Timed PYQ Drills / 30% Mock & Error Analysis",
+                    cadence: "3 Full Mocks (Days 9, 12, 14)",
+                    topics: "QA (40%): PLD, SI/CI, Linear & Quadratic Eq, Logs/Surds. DILR (35%): 3 sets/day from 3/4-Set Venn & Games/Tournaments. VARC (25%): 3 RCs + 4 Odd-Out + distractor elimination.",
+                    trigger: "Trigger: If RC accuracy <65%, drop from 4 RCs to 2–3 RCs per mock and slow down reading pace."
+                },
+                {
+                    phase: "Week 3: Inequalities, Core Geometry & Quant Grids",
+                    split: "15% Concept / 45% Sectional Sprints / 40% Mock Analysis",
+                    cadence: "3 Full Mocks (Days 16, 19, 21) • Audit Marks-per-Minute",
+                    topics: "QA (35%): Inequalities/Modulus, Basic AP/GP, Core Triangle/Circle/Mensuration formulas, Basic TSD. DILR (40%): 3 sets/day from Quant Grids & Unconventional Charts. VARC (25%): Timed 40-min sectionals (3 RCs + 8 VA).",
+                    trigger: "Drop circular races with 3+ runners, complex network routing, and double-negative RC items in Round 1."
+                },
+                {
+                    phase: "Week 4 (Days 22–30): Official Slot Dress Rehearsals",
+                    split: "100% Official PYQ Simulation, Error-Log Re-solving & Formula Consolidation",
+                    cadence: "6 Official PYQ Slot Simulations (CAT 2023 Slots 1–3 & CAT 2024 Slots 1–3)",
+                    topics: "Days 22–27: Complete CAT 2023 & 2024 slots at assigned exam hour + 3-hr deep error-log re-solving. Days 28–30: Formula deck review & rest.",
+                    trigger: "Target: 8–10 QA Qs, 2 DILR sets, 14–16 VARC Qs (~95–98%ile)."
+                }
+            ]
+        };
+
+        const ERROR_TAXONOMY = [
+            { code: "E01", name: "Conceptual Gap", sec: "QA, DILR", def: "Candidate could not solve the item even untimed after the mock due to unfamiliar theory.", fix: "Study underlying concept notes and complete 20 foundational problems on that subtopic within 48 hours." },
+            { code: "E02", name: "Formula / Method Gap", sec: "QA", def: "Concept understood, but forgot specific identity or used a 4-minute algebraic grind instead of a 60-second property.", fix: "Add identity/shortcut to daily flashcard deck; re-solve 5 variations using the optimal method." },
+            { code: "E03", name: "Calculation Mistake", sec: "QA, Pure DI", def: "Correct logical setup, but arithmetic slip in mental multiplication, fraction addition, or sign flip.", fix: "Execute 15 minutes of daily mental percentage/ratio and units-digit/approximation drills." },
+            { code: "E04", name: "Misreading", sec: "All Sections", def: "Answered for 'sold' instead of 'unsold', 'at most' instead of 'at least', or missed 'NOT/EXCEPT' in RC.", fix: "Write the target variable symbol and polarity explicitly at the top of the scratchpad before solving." },
+            { code: "E05", name: "Weak Inference", sec: "VARC", def: "Selected an RC or Para Summary option that extrapolated beyond the author's text or distorted quantifier scope.", fix: "During post-mock audit, write down the exact sentence number in the passage that proves the correct option." },
+            { code: "E06", name: "Incorrect Assumption", sec: "DILR, QA", def: "Assumed a tournament had no draws, numbers were distinct integers when reals were allowed, or seating was 1-to-1.", fix: "Re-read set preamble constraints; list allowed domain sets before constructing the master grid." },
+            { code: "E07", name: "Poor Set Selection", sec: "DILR, VARC", def: "Committed 12+ minutes to a Level 8–9 DILR set or abstract RC while leaving a Level 4–5 set/passage unattempted.", fix: "Re-run the 5-minute opening scan on the mock paper to identify which visual cue caused the misranking." },
+            { code: "E08", name: "Time-Management Failure", sec: "QA, DILR", def: "Spent >180 seconds on a single QA question in Round 1 or >15 minutes on a stalled DILR set.", fix: "Enforce hard physical cutoffs: abandon any QA Round-1 question at 120s and any unanchored DILR set at 240s." },
+            { code: "E09", name: "Guessing Error", sec: "All Sections", def: "Marked an MCQ guess among 3 or 4 uneliminated options, or left a zero-penalty TITA blank empty.", fix: "Restrict MCQ guessing strictly to 50/50 two-option splits (EV = +1.0); enforce 100% TITA fill rate." },
+            { code: "E10", name: "Careless Execution", sec: "All Sections", def: "Solved correctly on scratch paper but keyed wrong TITA digits or clicked the wrong MCQ radio option.", fix: "Institute a mandatory 3-second verification pause between scratchpad final answer and screen selection." }
+        ];
+
+        let currentSyllabusSection = 'ALL';
+        let currentSyllabusPriority = 'ALL';
+        let masteredTopics = JSON.parse(localStorage.getItem('cat_blueprint_mastered') || '{}');
+
+        // Theme Toggle
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+        }
+
+        // Scroll Progress Listener
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
+            document.getElementById('readingProgressBar').style.width = scrolled + '%';
+        });
+
+        // Main Tab Switching
+        function switchMainTab(tabId) {
+            const tabs = ['overview', 'syllabus', 'archetypes', 'dependencies', 'roadmaps', 'analytics'];
+            tabs.forEach(t => {
+                const viewEl = document.getElementById('view-' + t);
+                const btnEl = document.getElementById('tab-' + t);
+                if (t === tabId) {
+                    viewEl.classList.remove('hidden');
+                    btnEl.classList.add('active');
+                    btnEl.classList.remove('text-slate-600', 'dark:text-slate-300');
+                } else {
+                    viewEl.classList.add('hidden');
+                    btnEl.classList.remove('active');
+                    btnEl.classList.add('text-slate-600', 'dark:text-slate-300');
+                }
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            lucide.createIcons();
+        }
+
+        // Institute Selector
+        function selectInstitute(instKey) {
+            Object.keys(INSTITUTES_DATA).forEach(k => {
+                const btn = document.getElementById('inst-' + k);
+                if (k === instKey) {
+                    btn.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition";
+                } else {
+                    btn.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition";
+                }
+            });
+            const d = INSTITUTES_DATA[instKey];
+            document.getElementById('instituteDetailCard').innerHTML = `
+                <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-2">
+                    <span class="font-bold text-sm text-indigo-600 dark:text-indigo-400">${d.name}</span>
+                    <span class="font-mono text-xs font-bold px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-600 dark:text-indigo-300">CAT Weight: ${d.catWeight}</span>
+                </div>
+                <div class="grid grid-cols-5 gap-2 text-center font-mono text-xs py-1">
+                    <div class="p-1.5 rounded bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-700">
+                        <div class="text-[10px] text-slate-400">10th</div>
+                        <div class="font-bold">${d.c10}</div>
+                    </div>
+                    <div class="p-1.5 rounded bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-700">
+                        <div class="text-[10px] text-slate-400">12th</div>
+                        <div class="font-bold">${d.c12}</div>
+                    </div>
+                    <div class="p-1.5 rounded bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-700">
+                        <div class="text-[10px] text-slate-400">Grad</div>
+                        <div class="font-bold">${d.grad}</div>
+                    </div>
+                    <div class="p-1.5 rounded bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-700">
+                        <div class="text-[10px] text-slate-400">Diversity</div>
+                        <div class="font-bold">${d.div}</div>
+                    </div>
+                    <div class="p-1.5 rounded bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-700">
+                        <div class="text-[10px] text-slate-400">WorkEx</div>
+                        <div class="font-bold">${d.work}</div>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-600 dark:text-slate-300"><strong>Takeaway:</strong> ${d.note}</p>
+            `;
+        }
+
+        // Syllabus Filtering & Rendering
+        function setSyllabusFilter(type, val) {
+            if (type === 'section') {
+                currentSyllabusSection = val;
+                ['ALL', 'QA', 'DILR', 'VARC'].forEach(s => {
+                    const btn = document.getElementById('secFilter-' + s);
+                    btn.className = (s === val)
+                        ? "flex-1 py-1.5 px-2 rounded-lg text-xs font-semibold bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm transition"
+                        : "flex-1 py-1.5 px-2 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 transition";
+                });
+            } else if (type === 'priority') {
+                currentSyllabusPriority = val;
+                ['ALL', 'P1', 'P2', 'P3'].forEach(p => {
+                    const btn = document.getElementById('prioFilter-' + p);
+                    btn.className = (p === val)
+                        ? "flex-1 py-1.5 px-2 rounded-lg text-xs font-semibold bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm transition"
+                        : "flex-1 py-1.5 px-2 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 transition";
+                });
+            }
+            renderSyllabusItems();
+        }
+
+        function toggleTopicMastery(id) {
+            if (masteredTopics[id]) {
+                delete masteredTopics[id];
+            } else {
+                masteredTopics[id] = true;
+            }
+            localStorage.setItem('cat_blueprint_mastered', JSON.stringify(masteredTopics));
+            updateGlobalMasteryUI();
+            renderSyllabusItems();
+        }
+
+        function resetMasteryProgress() {
+            masteredTopics = {};
+            localStorage.removeItem('cat_blueprint_mastered');
+            updateGlobalMasteryUI();
+            renderSyllabusItems();
+        }
+
+        function updateGlobalMasteryUI() {
+            const total = SYLLABUS_ITEMS.length;
+            const done = Object.keys(masteredTopics).length;
+            const pct = Math.round((done / total) * 100);
+            document.getElementById('globalMasteryText').textContent = `${done}/${total} (${pct}%)`;
+            document.getElementById('globalMasteryBar').style.width = `${pct}%`;
+        }
+
+        function renderSyllabusItems() {
+            const query = (document.getElementById('topicSearchInput')?.value || '').toLowerCase().trim();
+            const sortMode = document.getElementById('topicSortSelect')?.value || 'spi-desc';
+
+            let filtered = SYLLABUS_ITEMS.filter(item => {
+                if (currentSyllabusSection !== 'ALL' && item.section !== currentSyllabusSection) return false;
+                if (currentSyllabusPriority === 'P1' && item.priority !== 'P1') return false;
+                if (currentSyllabusPriority === 'P2' && item.priority !== 'P2') return false;
+                if (currentSyllabusPriority === 'P3' && (item.priority !== 'P3' && item.priority !== 'P4')) return false;
+                if (query) {
+                    const hay = `${item.name} ${item.domain} ${item.concepts} ${item.archetype} ${item.trap}`.toLowerCase();
+                    if (!hay.includes(query)) return false;
+                }
+                return true;
+            });
+
+            filtered.sort((a, b) => {
+                if (sortMode === 'spi-desc') return b.spi - a.spi;
+                if (sortMode === 'freq-desc') return b.share - a.share;
+                if (sortMode === 'diff-asc') return a.diffAvg - b.diffAvg;
+                if (sortMode === 'diff-desc') return b.diffAvg - a.diffAvg;
+                return 0;
+            });
+
+            document.getElementById('syllabusFilterStats').textContent = `Showing ${filtered.length} of ${SYLLABUS_ITEMS.length} granular study units`;
+
+            const container = document.getElementById('syllabusCardsContainer');
+            container.innerHTML = filtered.map(item => {
+                const isDone = !!masteredTopics[item.id];
+                const prioBadge = item.priority === 'P1'
+                    ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
+                    : item.priority === 'P2'
+                        ? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20'
+                        : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20';
+
+                const secBadge = item.section === 'QA'
+                    ? 'bg-emerald-600 text-white'
+                    : item.section === 'DILR'
+                        ? 'bg-purple-600 text-white'
+                        : 'bg-blue-600 text-white';
+
+                return `
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl border ${isDone ? 'border-emerald-500/60 bg-emerald-50/10' : 'border-slate-200 dark:border-slate-800'} p-5 shadow-sm flex flex-col justify-between transition hover:border-indigo-500/40">
+                        <div>
+                            <!-- Top Row Badges -->
+                            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="px-2 py-0.5 rounded text-[11px] font-bold ${secBadge}">${item.section}</span>
+                                    <span class="text-xs font-medium text-slate-500 dark:text-slate-400">${item.domain}</span>
+                                    <span class="px-2 py-0.5 rounded-full text-[11px] font-bold border ${prioBadge}">${item.priority}</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 font-mono text-xs font-extrabold text-indigo-600 dark:text-indigo-400">
+                                        SPI ${item.spi.toFixed(1)}
+                                    </div>
+                                    <button onclick="toggleTopicMastery('${item.id}')" class="px-2.5 py-1 rounded-lg text-xs font-semibold border transition flex items-center gap-1 ${isDone ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-emerald-500'}">
+                                        <span>${isDone ? '✓ Mastered' : 'Mark Done'}</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Title -->
+                            <h3 class="text-base font-bold text-slate-900 dark:text-white mb-3">${item.name}</h3>
+
+                            <!-- Metrics Strip -->
+                            <div class="grid grid-cols-4 gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 mb-3 text-center font-mono text-xs">
+                                <div>
+                                    <div class="text-[10px] text-slate-400 font-sans">Slot Count</div>
+                                    <div class="font-bold text-slate-800 dark:text-slate-200">${item.slotRange}</div>
+                                </div>
+                                <div>
+                                    <div class="text-[10px] text-slate-400 font-sans">Section Share</div>
+                                    <div class="font-bold text-indigo-600 dark:text-indigo-400">${item.share}%</div>
+                                </div>
+                                <div>
+                                    <div class="text-[10px] text-slate-400 font-sans">Difficulty</div>
+                                    <div class="font-bold text-slate-800 dark:text-slate-200">${item.diff}</div>
+                                </div>
+                                <div>
+                                    <div class="text-[10px] text-slate-400 font-sans">Prep / Vol</div>
+                                    <div class="font-bold text-slate-800 dark:text-slate-200">${item.practiceVol}</div>
+                                </div>
+                            </div>
+
+                            <!-- Granular Details -->
+                            <div class="space-y-2 text-xs text-slate-600 dark:text-slate-300">
+                                <p><strong class="text-slate-900 dark:text-slate-100">Core Study Units:</strong> ${item.concepts}</p>
+                                <p><strong class="text-slate-900 dark:text-slate-100">Recurring CAT Pattern:</strong> ${item.archetype}</p>
+                            </div>
+                        </div>
+
+                        <!-- Trap Warning Footer -->
+                        <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-start gap-2 text-xs text-rose-600 dark:text-rose-400">
+                            <span class="font-bold shrink-0">⚠️ Trap:</span>
+                            <span>${item.trap}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Walkthrough Switcher
+        function switchWalkthrough(sec) {
+            ['qa', 'dilr', 'varc'].forEach(s => {
+                const btn = document.getElementById('wtBtn-' + s);
+                const content = document.getElementById('wtContent-' + s);
+                if (s === sec) {
+                    btn.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm transition";
+                    content.classList.remove('hidden');
+                    content.classList.add('grid');
+                } else {
+                    btn.className = "px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 transition";
+                    content.classList.add('hidden');
+                    content.classList.remove('grid');
+                }
+            });
+        }
+
+        // Profile Matrix Switcher
+        function selectProfile(profKey) {
+            ['beginner', 'intermediate', 'advanced', 'constrained'].forEach(k => {
+                const btn = document.getElementById('profBtn-' + k);
+                btn.className = (k === profKey)
+                    ? "px-3.5 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-sm transition"
+                    : "px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition";
+            });
+            const p = PROFILES_DATA[profKey];
+            document.getElementById('profileMatrixOutput').innerHTML = `
+                <div class="p-4 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800/60 flex flex-col justify-between">
+                    <div>
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Selected Profile</span>
+                        <h4 class="font-bold text-base mt-1">${p.title}</h4>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 mt-2 leading-relaxed">${p.objective}</p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-indigo-200/60 dark:border-indigo-800/60 text-[11px] font-mono text-indigo-700 dark:text-indigo-300">
+                        Solve 45%–50% of paper @ 85%+ accuracy
+                    </div>
+                </div>
+                <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                    <div class="font-bold text-xs text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-2">QA Priority Sequence</div>
+                    <ul class="space-y-1.5 text-xs text-slate-700 dark:text-slate-300">
+                        ${p.qa.map(i => `<li class="font-medium">${i}</li>`).join('')}
+                    </ul>
+                </div>
+                <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                    <div class="font-bold text-xs text-purple-600 dark:text-purple-400 uppercase tracking-wider mb-2">DILR Priority Sequence</div>
+                    <ul class="space-y-1.5 text-xs text-slate-700 dark:text-slate-300">
+                        ${p.dilr.map(i => `<li class="font-medium">${i}</li>`).join('')}
+                    </ul>
+                </div>
+                <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                    <div class="font-bold text-xs text-blue-600 dark:text-blue-400 uppercase tracking-wider mb-2">VARC Priority Sequence</div>
+                    <ul class="space-y-1.5 text-xs text-slate-700 dark:text-slate-300">
+                        ${p.varc.map(i => `<li class="font-medium">${i}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+
+        // Daily Schedule Model Switcher
+        function switchDailyModel(modelKey) {
+            ['working', 'fulltime'].forEach(k => {
+                const btn = document.getElementById('dailyBtn-' + k);
+                btn.className = (k === modelKey)
+                    ? "px-3.5 py-2 rounded-lg text-xs font-bold bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm transition"
+                    : "px-3.5 py-2 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 transition";
+            });
+            const blocks = DAILY_MODELS[modelKey];
+            document.getElementById('dailyScheduleBlocks').innerHTML = blocks.map(b => `
+                <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-1.5">
+                    <div class="text-xs font-semibold text-slate-400">${b.slot}</div>
+                    <div class="text-sm font-bold text-indigo-600 dark:text-indigo-400 font-mono">${b.time}</div>
+                    <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">${b.desc}</p>
+                </div>
+            `).join('');
+        }
+
+        // Roadmap Selector
+        function selectRoadmap(daysKey) {
+            ['180', '90', '60', '30'].forEach(k => {
+                const btn = document.getElementById('rmBtn-' + k);
+                if (k === daysKey) {
+                    btn.className = "px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-indigo-600 text-white shadow-sm transition";
+                } else {
+                    btn.className = "px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition";
+                }
+            });
+            const phases = ROADMAPS_DATA[daysKey];
+            document.getElementById('roadmapPhasesContainer').innerHTML = phases.map((p, idx) => `
+                <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 space-y-3">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-7 h-7 rounded-lg bg-indigo-600 text-white font-mono text-xs font-bold flex items-center justify-center">${idx + 1}</span>
+                            <h4 class="font-bold text-base text-slate-900 dark:text-white">${p.phase}</h4>
+                        </div>
+                        <span class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-mono text-indigo-600 dark:text-indigo-400">${p.cadence}</span>
+                    </div>
+                    <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed"><strong>Recommended Topic Sequence:</strong> ${p.topics}</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 text-xs">
+                        <div class="p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-700">
+                            <span class="font-bold text-slate-700 dark:text-slate-200">Allocation Split:</span> ${p.split}
+                        </div>
+                        <div class="p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-800 dark:text-amber-300">
+                            <span class="font-bold">Checkpoint & Trigger:</span> ${p.trigger}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Percentile Simulator Interpolation
+        function estimateBand(score, thresholds) {
+            // thresholds: [[score, pct], ...] descending
+            if (score >= thresholds[0][0]) return "99.9+ %ile";
+            for (let i = 0; i < thresholds.length - 1; i++) {
+                const [sHigh, pHigh] = thresholds[i];
+                const [sLow, pLow] = thresholds[i + 1];
+                if (score <= sHigh && score >= sLow) {
+                    const ratio = (score - sLow) / (sHigh - sLow || 1);
+                    const val = pLow + ratio * (pHigh - pLow);
+                    return val.toFixed(1) + " %ile";
+                }
+            }
+            return "< 80.0 %ile";
+        }
+
+        function setSimPreset(v, d, q) {
+            document.getElementById('simVarcSlider').value = v;
+            document.getElementById('simDilrSlider').value = d;
+            document.getElementById('simQaSlider').value = q;
+            updatePercentileSimulator();
+        }
+
+        function updatePercentileSimulator() {
+            const v = parseInt(document.getElementById('simVarcSlider').value, 10);
+            const d = parseInt(document.getElementById('simDilrSlider').value, 10);
+            const q = parseInt(document.getElementById('simQaSlider').value, 10);
+            const total = v + d + q;
+            const pctMarks = ((total / 204) * 100).toFixed(1);
+
+            document.getElementById('simVarcVal').textContent = `${v} Marks (~${(v / 3).toFixed(1)} Net Qs)`;
+            document.getElementById('simDilrVal').textContent = `${d} Marks (~${(d / 12).toFixed(1)} Sets)`;
+            document.getElementById('simQaVal').textContent = `${q} Marks (~${(q / 3).toFixed(1)} Net Qs)`;
+            document.getElementById('simTotalScore').innerHTML = `${total} / 204 <span class="text-sm font-normal text-slate-300">(${pctMarks}% Marks)</span>`;
+
+            // Overall Percentile Curves
+            const curve2025 = [[111.5, 99.9], [93.0, 99.5], [84.8, 99.0], [62.3, 95.0], [51.5, 90.0], [44.2, 85.0], [38.0, 80.0]];
+            const curve2024 = [[127.0, 99.9], [104.0, 99.5], [95.1, 99.0], [70.0, 95.0], [58.0, 90.0], [50.0, 85.0], [44.0, 80.0]];
+            const curve2023 = [[103.0, 99.9], [91.0, 99.5], [81.5, 99.0], [54.0, 95.0], [45.0, 90.0], [39.0, 85.0], [33.5, 80.0]];
+
+            document.getElementById('simPct2025').textContent = estimateBand(total, curve2025);
+            document.getElementById('simPct2024').textContent = estimateBand(total, curve2024);
+            document.getElementById('simPct2023').textContent = estimateBand(total, curve2023);
+
+            // Sectional Cutoffs Check (CAT 2025 85th %ile gate: V=22, D=14, Q=12)
+            const vPct25 = estimateBand(v, [[53, 99.9], [48, 99.5], [44, 99.0], [32.5, 95.0], [26, 90.0], [22, 85.0], [19, 80.0]]);
+            const dPct25 = estimateBand(d, [[38, 99.9], [33, 99.5], [29.8, 99.0], [21.5, 95.0], [16.7, 90.0], [14, 85.0], [11.5, 80.0]]);
+            const qPct25 = estimateBand(q, [[37, 99.9], [31.2, 99.5], [27.3, 99.0], [18.5, 95.0], [15, 90.0], [12, 85.0], [10, 80.0]]);
+
+            document.getElementById('simSectionalBreakdown').innerHTML = `
+                <span>VARC ('25): <strong>${vPct25}</strong></span>
+                <span>DILR ('25): <strong>${dPct25}</strong></span>
+                <span>QA ('25): <strong>${qPct25}</strong></span>
+            `;
+
+            const badge = document.getElementById('simCutoffBadge');
+            if (v >= 22 && d >= 14 && q >= 12) {
+                badge.className = "px-3 py-1.5 rounded-xl bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-bold";
+                badge.textContent = "✅ All 85%ile Sectional Gates Cleared";
+            } else {
+                badge.className = "px-3 py-1.5 rounded-xl bg-rose-500/20 border border-rose-400/30 text-rose-300 text-xs font-bold";
+                badge.textContent = "⚠️ Sectional Cutoff Alert (<85%ile in ≥1 Sec)";
+            }
+        }
+
+        // Error Taxonomy Interactive Selector
+        function renderErrorTaxonomy(selectedCode = 'E01') {
+            const btnContainer = document.getElementById('errorTaxonomyButtons');
+            btnContainer.innerHTML = ERROR_TAXONOMY.map(e => `
+                <button onclick="renderErrorTaxonomy('${e.code}')" class="p-2 rounded-xl text-left border transition ${e.code === selectedCode ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-slate-50 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-indigo-400'}">
+                    <div class="font-mono text-xs font-extrabold">${e.code}</div>
+                    <div class="text-[11px] truncate font-medium">${e.name}</div>
+                </button>
+            `).join('');
+
+            const item = ERROR_TAXONOMY.find(e => e.code === selectedCode) || ERROR_TAXONOMY[0];
+            document.getElementById('errorTaxonomyDetail').innerHTML = `
+                <div class="flex items-center justify-between">
+                    <span class="font-bold text-sm text-indigo-600 dark:text-indigo-400">${item.code}: ${item.name}</span>
+                    <span class="px-2 py-0.5 rounded text-xs font-mono bg-slate-200 dark:bg-slate-700">Primary Section: ${item.sec}</span>
+                </div>
+                <p class="text-xs text-slate-600 dark:text-slate-300"><strong>Diagnostic Definition:</strong> ${item.def}</p>
+                <p class="text-xs text-emerald-600 dark:text-emerald-400 font-medium"><strong>Mandatory Corrective Rule:</strong> ${item.fix}</p>
+            `;
+        }
+
+        // Copy & Download 18-Column Schema
+        const SCHEMA_HEADERS = [
+            "Date", "Mock_ID", "Section", "Topic", "Subtopic", "Question_or_Set_ID",
+            "Difficulty", "Attempt_Status", "Outcome", "Time_Spent_Sec", "Marks_Obtained",
+            "Accuracy", "Error_Category", "Root_Cause", "Solvable_With_Current_Knowledge",
+            "Revision_Requirement", "Next_Review_Date", "Recommended_Action"
+        ];
+
+        function copyMockSchemaHeaders() {
+            const tsv = SCHEMA_HEADERS.join("\t");
+            const tempInput = document.createElement("textarea");
+            tempInput.value = tsv;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+
+            const btnText = document.getElementById("copySchemaBtnText");
+            btnText.textContent = "✓ Copied! Paste in Google Sheets";
+            setTimeout(() => {
+                btnText.textContent = "Copy 18 Tab-Separated Headers";
+            }, 2500);
+        }
+
+        function downloadMockCsvTemplate() {
+            const sampleRows = [
+                SCHEMA_HEADERS.join(","),
+                "2026-10-18,CDC_09,QA,Arithmetic,Mixtures,QA_Q14,5,Attempted_R1,Incorrect,145,-1,0,E04,Answered for sold instead of unsold remainder,Yes_Under_2m,Speed_Drill,2026-10-25,Write target variable symbol at top of scratchpad",
+                "2026-10-18,CDC_09,DILR,Pure_LR,Games_Tournaments,DILR_Set2_Q6-10,7,Attempted_R1,Correct,680,12,1,None,Locked group split in 3 mins,Yes_Under_2m,None,2026-10-25,Maintain 4-min invariant check",
+                "2026-10-18,CDC_09,VARC,VA,Para_Summary,VARC_Q21,6,Attempted_R1,Incorrect,95,-1,0,E05,Fell for narrow-scope example trap,Yes_Under_2m,Urgent_Concept,2026-10-21,Audit Cause + Core Effect split on 15 PYQ summaries"
+            ].join("\n");
+
+            const blob = new Blob([sampleRows], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "CAT_Mock_Analytics_18Col_Tracker.csv";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // Initialize All Views on Load
+        window.onload = function () {
+            selectInstitute('IIMA');
+            updateGlobalMasteryUI();
+            renderSyllabusItems();
+            selectProfile('beginner');
+            switchDailyModel('working');
+            selectRoadmap('180');
+            updatePercentileSimulator();
+            renderErrorTaxonomy('E01');
+            lucide.createIcons();
+        };
+    </script>
+</body>
+</html>
